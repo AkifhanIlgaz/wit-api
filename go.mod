@@ -5,6 +5,7 @@ go 1.21.0
 require (
 	cloud.google.com/go/firestore v1.9.0
 	firebase.google.com/go/v4 v4.12.0
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.114.0
 )
