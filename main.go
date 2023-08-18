@@ -10,17 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Outfit struct {
-	Id       string
-	Uid      string
-	PhotoUrl string
-	Links    []Link
-}
 
-type Link struct {
-	Name string
-	Href string
-}
 
 func main() {
 	godotenv.Load()
