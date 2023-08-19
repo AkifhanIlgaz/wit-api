@@ -10,8 +10,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
-
 func main() {
 	godotenv.Load()
 
@@ -21,6 +19,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	outfit := firebase.Outfit{
+		Uid:      "sdşfsdşlf",
+		PhotoUrl: "photourl",
+	}
+
+	myApp.FirestoreService.AddOutfit(outfit)
 
 	r := chi.NewRouter()
 	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {

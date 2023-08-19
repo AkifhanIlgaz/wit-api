@@ -1,8 +1,13 @@
 package firebase
 
 import (
+	"context"
+	"fmt"
+
 	"cloud.google.com/go/firestore"
 )
+
+const outfitCollection = "outfits"
 
 type Outfit struct {
 	Id       string
@@ -20,13 +25,13 @@ type FirestoreService struct {
 	Client *firestore.Client
 }
 
-func (service *FirestoreService) AddDocument(collection string, data any) error {
-	// ref, _, err := service.Client.Collection(collection).Add(context.TODO(), data)
-	// if err != nil {
-	// 	return fmt.Errorf("add document: %w", err)
-	// }
+func (service *FirestoreService) AddOutfit(outfit Outfit) error {
+	ref, _, err := service.Client.Collection(outfitCollection).Add(context.TODO(), outfit)
+	if err != nil {
+		return fmt.Errorf("add document: %w", err)
+	}
 
-	// snapshot, _ := ref.Get(context.TODO())
-
+	snapshot, _ := ref.Get(context.TODO())
+	fmt.Println(snapshot.Ref.ID)
 	return nil
 }
