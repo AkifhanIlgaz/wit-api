@@ -22,7 +22,13 @@ func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	outfit.Uid = r.Context().Value("uid").(string)
+	uid, ok := r.Context().Value("uid").(string)
+	if ok == false {
+		http.Error(w, "Cannot find user uid", http.StatusNotFound)
+		return
+	}
+	outfit.Uid = uid
+
 	err = controller.OutfitService.AddOutfit(&outfit)
 	if err != nil {
 		fmt.Println(err)
@@ -30,5 +36,6 @@ func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	encoder := json.NewEncoder(w)
+	encoder.Encode(&outfit)
 }
