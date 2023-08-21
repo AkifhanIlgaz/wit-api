@@ -10,28 +10,33 @@ import (
 const outfitCollection = "outfits"
 
 type Outfit struct {
-	Id       string
-	Uid      string
-	PhotoUrl string
-	Links    []Link
+	Uid      string `json:"uid"`
+	PhotoURL string `json:"photoURL"`
+	Links    []Link `json:"links"`
 }
 
 type Link struct {
-	Name string
-	Href string
+	Title    string   `json:"title"`
+	Href     string   `json:"href"`
+	Position Position `json:"position"`
+}
+
+type Position struct {
+	Left string `json:"left"`
+	Top  string `json:"top"`
 }
 
 type FirestoreService struct {
 	Client *firestore.Client
 }
 
-func (service *FirestoreService) AddOutfit(outfit Outfit) error {
-	ref, _, err := service.Client.Collection(outfitCollection).Add(context.TODO(), outfit)
+func (service *FirestoreService) AddOutfit(outfit *Outfit) error {
+	doc := service.Client.Collection(outfitCollection).NewDoc()
+	_, err := doc.Set(context.TODO(), outfit)
 	if err != nil {
 		return fmt.Errorf("add document: %w", err)
 	}
 
-	snapshot, _ := ref.Get(context.TODO())
-	fmt.Println(snapshot.Ref.ID)
+	fmt.Println(outfit)
 	return nil
 }
