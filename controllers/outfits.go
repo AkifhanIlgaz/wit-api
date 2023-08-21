@@ -14,6 +14,7 @@ type OutfitsController struct {
 
 func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request) {
 	var outfit models.Outfit
+	outfit.Uid = r.Context().Value("uid").(string)
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&outfit)

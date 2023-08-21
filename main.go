@@ -22,7 +22,11 @@ func main() {
 	}
 
 	outfitsController := controllers.OutfitsController{
-		*myApp.FirestoreService.OutfitService,
+		OutfitService: *myApp.FirestoreService.OutfitService,
+	}
+
+	uidMiddleware := controllers.UidMiddleware{
+		AuthService: myApp.AuthService,
 	}
 
 	// links := []firebase.Link{
@@ -48,14 +52,9 @@ func main() {
 
 	r := chi.NewRouter()
 
+	r.Use(uidMiddleware.SetUid)
 	// r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
 	// 	// TODO: Embed uid inside of request's context by middleware
-	// 	idToken := r.Header.Get("idToken")
-	// 	uid, err := myApp.AuthService.GetUidByIdToken(idToken)
-	// 	if err != nil {
-	// 		fmt.Fprintln(w, err)
-	// 	}
-	// 	fmt.Println(uid)
 
 	// 	photoURL := r.FormValue("photoURL")
 	// 	fmt.Println(photoURL)
