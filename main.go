@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/AkifhanIlgaz/wit-api/controllers"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -18,6 +19,10 @@ func main() {
 	myApp, err := firebase.NewApp(credentialsFile)
 	if err != nil {
 		panic(err)
+	}
+
+	outfitsController := controllers.OutfitsController{
+		*myApp.FirestoreService.OutfitService,
 	}
 
 	// links := []firebase.Link{
@@ -43,18 +48,20 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Embed uid inside of request's context by middleware
-		idToken := r.Header.Get("idToken")
-		uid, err := myApp.AuthService.GetUidByIdToken(idToken)
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		fmt.Println(uid)
+	// r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
+	// 	// TODO: Embed uid inside of request's context by middleware
+	// 	idToken := r.Header.Get("idToken")
+	// 	uid, err := myApp.AuthService.GetUidByIdToken(idToken)
+	// 	if err != nil {
+	// 		fmt.Fprintln(w, err)
+	// 	}
+	// 	fmt.Println(uid)
 
-		photoURL := r.FormValue("photoURL")
-		fmt.Println(photoURL)
-	})
+	// 	photoURL := r.FormValue("photoURL")
+	// 	fmt.Println(photoURL)
+	// })
+
+	r.Post("/outfits/add", outfitsController.Add)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
