@@ -23,18 +23,8 @@ func NewApp(credentialsFile string) (*MyApp, error) {
 		return nil, fmt.Errorf("new app: %w", err)
 	}
 
-	auth, err := app.Auth(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("new app | auth: %w", err)
-	}
-
-	firestore, err := app.Firestore(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("new app | firestore: %w", err)
-	}
-
 	return &MyApp{
-		AuthService:      &AuthService{auth},
-		FirestoreService: &FirestoreService{firestore},
+		AuthService:      NewAuthService(*app),
+		FirestoreService: NewFirestoreService(*app),
 	}, nil
 }

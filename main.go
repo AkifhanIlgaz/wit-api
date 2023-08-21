@@ -20,33 +20,28 @@ func main() {
 		panic(err)
 	}
 
-	links := []firebase.Link{
-		{Title: "first link",
-			Href:     "first link href",
-			Position: firebase.Position{Left: "50%", Top: "50%"},
-		},
-		{Title: "second link",
-			Href:     "second link href",
-			Position: firebase.Position{Left: "25%", Top: "25%"},
-		},
-		{Title: "third link",
-			Href:     "third link href",
-			Position: firebase.Position{Left: "75%", Top: "75%"},
-		},
-	}
+	// links := []firebase.Link{
+	// 	{Title: "first link",
+	// 		Href:     "first link href",
+	// 		Position: firebase.Position{Left: "50%", Top: "50%"},
+	// 	},
+	// 	{Title: "second link",
+	// 		Href:     "second link href",
+	// 		Position: firebase.Position{Left: "25%", Top: "25%"},
+	// 	},
+	// 	{Title: "third link",
+	// 		Href:     "third link href",
+	// 		Position: firebase.Position{Left: "75%", Top: "75%"},
+	// 	},
+	// }
 
-	outfit := firebase.Outfit{
-		Uid:      "user id",
-		PhotoURL: "photo url",
-		Links:    links,
-	}
+	// outfit := firebase.Outfit{
+	// 	Uid:      "user id",
+	// 	PhotoURL: "photo url",
+	// 	Links:    links,
+	// }
 
 	r := chi.NewRouter()
-
-	r.Post("/add", func(w http.ResponseWriter, r *http.Request) {
-		myApp.FirestoreService.AddOutfit(&outfit)
-		// TODO: Create outfit from form values
-	})
 
 	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
 		// TODO: Embed uid inside of request's context by middleware

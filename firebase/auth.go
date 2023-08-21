@@ -4,11 +4,22 @@ import (
 	"context"
 	"fmt"
 
+	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 )
 
 type AuthService struct {
 	Client *auth.Client
+}
+
+func NewAuthService(app firebase.App) *AuthService {
+	auth, err := app.Auth(context.TODO())
+	if err != nil {
+		panic(err)
+	}
+	return &AuthService{
+		Client: auth,
+	}
 }
 
 func (service *AuthService) GetUidByIdToken(idToken string) (string, error) {
