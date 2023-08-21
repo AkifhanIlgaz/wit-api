@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"context"
 	"net/http"
 
+	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 )
 
@@ -20,8 +20,8 @@ func (umw UidMiddleware) SetUid(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "uid", uid)
-		r = r.WithContext(ctx)
+
+		r = r.WithContext(ctx.WithUid(r.Context(), uid))
 
 		next.ServeHTTP(w, r)
 	})

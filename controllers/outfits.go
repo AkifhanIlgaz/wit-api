@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/models"
 )
 
@@ -22,12 +23,7 @@ func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	uid, ok := r.Context().Value("uid").(string)
-	if ok == false {
-		http.Error(w, "Cannot find user uid", http.StatusNotFound)
-		return
-	}
-	outfit.Uid = uid
+	outfit.Uid = *ctx.Uid(r.Context())
 
 	err = controller.OutfitService.AddOutfit(&outfit)
 	if err != nil {
