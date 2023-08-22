@@ -29,34 +29,15 @@ func main() {
 		AuthService: myApp.AuthService,
 	}
 
-	// links := []firebase.Link{
-	// 	{Title: "first link",
-	// 		Href:     "first link href",
-	// 		Position: firebase.Position{Left: "50%", Top: "50%"},
-	// 	},
-	// 	{Title: "second link",
-	// 		Href:     "second link href",
-	// 		Position: firebase.Position{Left: "25%", Top: "25%"},
-	// 	},
-	// 	{Title: "third link",
-	// 		Href:     "third link href",
-	// 		Position: firebase.Position{Left: "75%", Top: "75%"},
-	// 	},
-	// }
-
-	// outfit := firebase.Outfit{
-	// 	Uid:      "user id",
-	// 	PhotoURL: "photo url",
-	// 	Links:    links,
-	// }
-
 	r := chi.NewRouter()
 
 	r.Use(uidMiddleware.SetUid)
 
-	r.Get("/outfits/all/{uid}", outfitsController.GetAllOutfitsByUid)
-	r.Get("/outfits/{outfitId}", outfitsController.GetOutfitById)
-	r.Post("/outfits/add", outfitsController.Add)
+	r.Route("/outfits", func(r chi.Router) {
+		r.Get("/all/{uid}", outfitsController.GetAllOutfitsByUid)
+		r.Get("/{outfitId}", outfitsController.GetOutfitById)
+		r.Post("/add", outfitsController.Add)
+	})
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
