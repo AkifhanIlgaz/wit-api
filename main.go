@@ -53,13 +53,8 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(uidMiddleware.SetUid)
-	// r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
-	// 	// TODO: Embed uid inside of request's context by middleware
 
-	// 	photoURL := r.FormValue("photoURL")
-	// 	fmt.Println(photoURL)
-	// })
-
+	r.Get("/outfits/{uid}", outfitsController.GetByUid)
 	r.Post("/outfits/add", outfitsController.Add)
 
 	fmt.Println("Starting app")

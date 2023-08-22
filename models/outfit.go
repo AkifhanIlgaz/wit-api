@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
 )
 
 const outfitCollection = "outfits"
@@ -38,4 +39,33 @@ func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 	}
 
 	return nil
+}
+
+func (service *OutfitService) GetAllOutfitsByUid(uid string) ([]Outfit, error) {
+	outfits := []Outfit{}
+
+	iter := service.Collection.Where("Uid", "==", uid).Documents(context.TODO())
+	for {
+		var outfit Outfit
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("get outfits by uid: %w", err)
+		}
+
+		err = doc.DataTo(&outfit)
+		if err != nil {
+			return nil, fmt.Errorf("get outfits by uid | data to: %w", err)
+		}
+
+		outfits = append(outfits, outfit)
+	}
+
+	return outfits, nil
+}
+
+func (service *OutfitService) GetOutfitById(outfitId string) (Outfit, error) {
+	panic("Implement this function")
 }

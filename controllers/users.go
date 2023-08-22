@@ -20,7 +20,6 @@ func (umw UidMiddleware) SetUid(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-
 		r = r.WithContext(ctx.WithUid(r.Context(), uid))
 
 		next.ServeHTTP(w, r)
