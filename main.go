@@ -54,7 +54,8 @@ func main() {
 
 	r.Use(uidMiddleware.SetUid)
 
-	r.Get("/outfits/{uid}", outfitsController.GetByUid)
+	r.Get("/outfits/all/{uid}", outfitsController.GetAllOutfitsByUid)
+	r.Get("/outfits/{outfitId}", outfitsController.GetOutfitById)
 	r.Post("/outfits/add", outfitsController.Add)
 
 	fmt.Println("Starting app")

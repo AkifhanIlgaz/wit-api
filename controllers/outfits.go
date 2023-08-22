@@ -25,7 +25,6 @@ func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request)
 	}
 
 	outfit.Uid = *ctx.Uid(r.Context())
-
 	err = controller.OutfitService.AddOutfit(&outfit)
 	if err != nil {
 		fmt.Println(err)
@@ -37,13 +36,12 @@ func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request)
 	encoder.Encode(&outfit)
 }
 
-func (controller *OutfitsController) GetByUid(w http.ResponseWriter, r *http.Request) {
+func (controller *OutfitsController) GetAllOutfitsByUid(w http.ResponseWriter, r *http.Request) {
 	uid := chi.URLParam(r, "uid")
 	if uid == "" {
 		http.Error(w, "Please give an valid uid", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(uid)
 
 	outfits, err := controller.OutfitService.GetAllOutfitsByUid(uid)
 	if err != nil {
@@ -54,4 +52,23 @@ func (controller *OutfitsController) GetByUid(w http.ResponseWriter, r *http.Req
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(&outfits)
+}
+
+func (controller *OutfitsController) GetOutfitById(w http.ResponseWriter, r *http.Request) {
+	outfitId := chi.URLParam(r, "outfitId")
+	if outfitId == "" {
+		http.Error(w, "Please give an valid id", http.StatusBadRequest)
+		return
+	}
+
+	outfit, err := controller.OutfitService.GetOutfitById(outfitId)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	encoder := json.NewEncoder(w)
+	encoder.Encode(&outfit)
+
 }
