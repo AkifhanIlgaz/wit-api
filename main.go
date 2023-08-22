@@ -36,6 +36,7 @@ func main() {
 	r.Route("/outfits", func(r chi.Router) {
 		r.Get("/all/{uid}", outfitsController.GetAllOutfitsByUid)
 		r.Get("/{outfitId}", outfitsController.GetOutfitById)
+		r.Delete("/{outfitId}", outfitsController.DeleteOutfit)
 		r.Post("/add", outfitsController.Add)
 	})
 

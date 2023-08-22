@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
@@ -11,10 +12,12 @@ import (
 const outfitCollection = "outfits"
 
 type Outfit struct {
-	Id       string `firestore:"id"`
-	Uid      string `firestore:"uid"`
-	PhotoURL string `firestore:"photoURL"`
-	Links    []Link `firestore:"links"`
+	Id        string    `firestore:"id"`
+	Uid       string    `firestore:"uid"`
+	PhotoURL  string    `firestore:"photoURL"`
+	Links     []Link    `firestore:"links"`
+	Likes     []string  `firestore:"likes"`
+	CreatedAt time.Time `firestore:"createdAt"`
 }
 
 type Link struct {
@@ -35,6 +38,7 @@ type OutfitService struct {
 func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 	doc := service.Collection.NewDoc()
 	outfit.Id = doc.ID
+	outfit.CreatedAt = time.Now()
 	_, err := doc.Set(context.TODO(), outfit)
 	if err != nil {
 		return fmt.Errorf("add document: %w", err)
@@ -42,6 +46,33 @@ func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 
 	return nil
 }
+
+func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
+	var outfit Outfit
+	// ! If current user is not the owner of this outfit return error
+	doc := service.Collection.Doc(outfitId)
+	snapshot, err := doc.Get(context.TODO())
+	if err != nil {
+		return fmt.Errorf("delete outfit | get: %w", err)
+	}
+	err = snapshot.DataTo(&outfit)
+	if err != nil {
+		return fmt.Errorf("delete outfit | data to: %w", err)
+	}
+
+	if outfit.Uid != uid {
+		return fmt.Errorf("current user is not the owner of this outfit")
+	}
+
+	_, err = doc.Delete(context.TODO())
+	if err != nil {
+		return fmt.Errorf("delete outfit: %w", err)
+	}
+
+	return nil
+}
+
+// TODO: Update outfit
 
 func (service *OutfitService) GetAllOutfitsByUid(uid string) ([]Outfit, error) {
 	outfits := []Outfit{}

@@ -72,3 +72,16 @@ func (controller *OutfitsController) GetOutfitById(w http.ResponseWriter, r *htt
 	encoder.Encode(&outfit)
 
 }
+
+func (controller *OutfitsController) DeleteOutfit(w http.ResponseWriter, r *http.Request) {
+	uid := *ctx.Uid(r.Context())
+	outfitId := chi.URLParam(r, "outfitId")
+
+	err := controller.OutfitService.DeleteOutfit(uid, outfitId)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	fmt.Fprint(w, "Successfully deleted")
+}
