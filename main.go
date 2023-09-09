@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -46,6 +47,41 @@ func main() {
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Successfully send request to localhost")
+	})
+
+	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
+		// img := r.Header.Get("image")
+		var img []byte
+		// id := uuid.New()
+
+		fmt.Println(myApp.StorageService.Bucket.Object("outfits/second").BucketName())
+
+		myApp.StorageService.Bucket.SignedURL()
+
+		reader, err := myApp.StorageService.Bucket.Object("outfits/second").NewReader(context.TODO())
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		n, err := reader.Read(img)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("read bytes: ", n)
+
+		fmt.Println(img)
+		// object.ObjectAttrs.Metadata = map[string]string{"firebaseStorageDownloadTokens": id.String()}
+
+		// defer object.Close()
+
+		// if _, err := io.Copy(object, bytes.NewReader([]byte(img))); err != nil {
+		// 	fmt.Println(err)
+
+		// }
+
+		fmt.Println("Successfully uploaded")
 	})
 
 	r.Route("/outfits", func(r chi.Router) {
