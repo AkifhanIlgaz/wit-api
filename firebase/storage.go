@@ -2,6 +2,8 @@ package firebase
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go/v4"
@@ -23,4 +25,18 @@ func NewStorageService(app firebase.App) *StorageService {
 	}
 
 	return &StorageService{Bucket: bucket}
+}
+
+func (service *StorageService) GenerateUploadUrl(uid, id, extension string) (string, error) {
+	objPath := fmt.Sprintf("%s/%s.%s", uid, id, extension)
+
+	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
+		Method:  "GET",
+		Expires: time.Now().Add(15 * time.Minute),
+	})
+	if err != nil {
+		return "", fmt.Errorf("generate upload url: %w", err)
+	}
+
+	return signedUrl, nil
 }

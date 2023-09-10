@@ -1,15 +1,12 @@
 package models
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/storage"
-	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
 
@@ -38,24 +35,6 @@ type Position struct {
 type OutfitService struct {
 	Collection *firestore.CollectionRef
 	Bucket     *storage.BucketHandle
-}
-
-func (service *OutfitService) UploadPhoto(imageBase64 string) string {
-	id := uuid.New()
-
-	fmt.Println(service.Bucket)
-
-	object := service.Bucket.Object("outfits/second")
-	writer := object.NewWriter(context.TODO())
-
-	writer.ObjectAttrs.Metadata = map[string]string{"firebaseStorageDownloadTokens": id.String()}
-	defer writer.Close()
-	if _, err := io.Copy(writer, bytes.NewReader([]byte(imageBase64))); err != nil {
-		fmt.Println(err)
-		return ""
-	}
-
-	return "Successfully uploaded"
 }
 
 func (service *OutfitService) AddOutfit(outfit *Outfit) error {

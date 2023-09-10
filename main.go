@@ -1,15 +1,16 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/AkifhanIlgaz/wit-api/controllers"
+	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
 
@@ -39,49 +40,25 @@ func main() {
 		AllowedOrigins: []string{"https://*", "http://*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "idToken"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "idToken", "fileExtension"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Successfully send request to localhost")
-	})
+	r.Get("/generate-upload-url", func(w http.ResponseWriter, r *http.Request) {
+		uid := ctx.Uid(r.Context())
+		fileExtension := r.Header.Get("fileExtension")
+		id := uuid.New()
 
-	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
-		// img := r.Header.Get("image")
-		var img []byte
-		// id := uuid.New()
-
-		fmt.Println(myApp.StorageService.Bucket.Object("outfits/second").BucketName())
-
-		myApp.StorageService.Bucket.SignedURL()
-
-		reader, err := myApp.StorageService.Bucket.Object("outfits/second").NewReader(context.TODO())
+		uploadUrl, err := myApp.StorageService.GenerateUploadUrl(*uid, id.String(), fileExtension)
 		if err != nil {
-			fmt.Println(err)
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
 
-		n, err := reader.Read(img)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("read bytes: ", n)
-
-		fmt.Println(img)
-		// object.ObjectAttrs.Metadata = map[string]string{"firebaseStorageDownloadTokens": id.String()}
-
-		// defer object.Close()
-
-		// if _, err := io.Copy(object, bytes.NewReader([]byte(img))); err != nil {
-		// 	fmt.Println(err)
-
-		// }
-
-		fmt.Println("Successfully uploaded")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, uploadUrl)
 	})
 
 	r.Route("/outfits", func(r chi.Router) {
