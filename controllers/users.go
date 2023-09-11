@@ -13,7 +13,7 @@ type UidMiddleware struct {
 
 func (umw UidMiddleware) SetUid(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		idToken := r.Header.Get("idToken")
+		idToken := r.Header.Get("Authorization")
 
 		uid, err := umw.AuthService.GetUidByIdToken(idToken)
 		if err != nil {
