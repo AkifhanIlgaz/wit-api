@@ -3,23 +3,21 @@ package firebase
 import (
 	"context"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
-	"github.com/AkifhanIlgaz/wit-api/models"
 )
 
-type FirestoreService struct {
-	OutfitService *models.OutfitService
+type Firestore struct {
+	Client *firestore.Client
 }
 
-func NewFirestoreService(app firebase.App) *FirestoreService {
+func NewFirestore(app firebase.App) *Firestore {
 	firestore, err := app.Firestore(context.TODO())
 	if err != nil {
 		panic(err)
 	}
 
-	return &FirestoreService{
-		OutfitService: &models.OutfitService{
-			Client: firestore,
-		},
+	return &Firestore{
+		Client: firestore,
 	}
 }

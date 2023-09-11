@@ -8,22 +8,22 @@ import (
 	"firebase.google.com/go/v4/auth"
 )
 
-type AuthService struct {
+type Auth struct {
 	Client *auth.Client
 }
 
-func NewAuthService(app firebase.App) *AuthService {
+func NewAuth(app firebase.App) *Auth {
 	auth, err := app.Auth(context.TODO())
 	if err != nil {
 		panic(err)
 	}
-	return &AuthService{
+	return &Auth{
 		Client: auth,
 	}
 }
 
-func (service *AuthService) GetUidByIdToken(idToken string) (string, error) {
-	token, err := service.Client.VerifyIDToken(context.TODO(), idToken)
+func (auth *Auth) GetUidByIdToken(idToken string) (string, error) {
+	token, err := auth.Client.VerifyIDToken(context.TODO(), idToken)
 	if err != nil {
 		return "", fmt.Errorf("get uid by id token: %w", err)
 	}

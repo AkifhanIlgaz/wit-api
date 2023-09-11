@@ -10,12 +10,12 @@ import (
 	firebase "firebase.google.com/go/v4"
 )
 
-type StorageService struct {
+type Storage struct {
 	BaseUrl string
 	Bucket  *storage.BucketHandle
 }
 
-func NewStorageService(app firebase.App) *StorageService {
+func NewStorage(app firebase.App) *Storage {
 	client, err := app.Storage(context.TODO())
 	if err != nil {
 		panic(err)
@@ -26,12 +26,12 @@ func NewStorageService(app firebase.App) *StorageService {
 		panic(err)
 	}
 
-	return &StorageService{
+	return &Storage{
 		BaseUrl: "https://storage.cloud.google.com/wearittomorrow-ab06f.appspot.com",
 		Bucket:  bucket}
 }
 
-func (service *StorageService) GenerateUploadUrl(uid string, timestamp int64, extension string) (string, string, error) {
+func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, extension string) (string, string, error) {
 	objPath := fmt.Sprintf("outfits/%s-%v.%s", uid, timestamp, extension)
 
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
@@ -47,6 +47,6 @@ func (service *StorageService) GenerateUploadUrl(uid string, timestamp int64, ex
 	return signedUrl, objPath, nil
 }
 
-func (service *StorageService) GetDownloadUrl(objPath string) string {
+func (service *Storage) GetDownloadUrl(objPath string) string {
 	return path.Join(service.BaseUrl, objPath)
 }

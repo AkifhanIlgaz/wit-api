@@ -25,12 +25,8 @@ func main() {
 		panic(err)
 	}
 
-	outfitsController := controllers.OutfitsController{
-		OutfitService: *myApp.FirestoreService.OutfitService,
-	}
-
 	uidMiddleware := controllers.UidMiddleware{
-		AuthService: myApp.AuthService,
+		Auth: myApp.Auth,
 	}
 
 	r := chi.NewRouter()
@@ -52,7 +48,7 @@ func main() {
 		fileExtension := r.Header.Get("fileExtension")
 		timestamp := time.Now().UnixMilli()
 
-		uploadUrl, filePath, err := myApp.StorageService.GenerateUploadUrl(*uid, timestamp, fileExtension)
+		uploadUrl, filePath, err := myApp.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
@@ -67,13 +63,6 @@ func main() {
 		encoder := json.NewEncoder(w)
 		encoder.Encode(resp)
 
-	})
-
-	r.Route("/outfits", func(r chi.Router) {
-		r.Get("/all/{uid}", outfitsController.GetAllOutfitsByUid)
-		r.Get("/{outfitId}", outfitsController.GetOutfitById)
-		r.Delete("/{outfitId}", outfitsController.DeleteOutfit)
-		r.Post("/add", outfitsController.Add)
 	})
 
 	fmt.Println("Starting app")

@@ -9,9 +9,9 @@ import (
 )
 
 type MyApp struct {
-	AuthService      *AuthService
-	FirestoreService *FirestoreService
-	StorageService   *StorageService
+	Auth      *Auth
+	Firestore *Firestore
+	Storage   *Storage
 }
 
 func NewApp(credentialsFile string) (*MyApp, error) {
@@ -28,8 +28,8 @@ func NewApp(credentialsFile string) (*MyApp, error) {
 	}
 
 	return &MyApp{
-		AuthService:      NewAuthService(*app),
-		FirestoreService: NewFirestoreService(*app),
-		StorageService:   NewStorageService(*app),
+		Auth:      NewAuth(*app),
+		Firestore: NewFirestore(*app),
+		Storage:   NewStorage(*app),
 	}, nil
 }

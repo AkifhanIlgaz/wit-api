@@ -8,14 +8,14 @@ import (
 )
 
 type UidMiddleware struct {
-	AuthService *firebase.AuthService
+	Auth *firebase.Auth
 }
 
 func (umw UidMiddleware) SetUid(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idToken := r.Header.Get("Authorization")
 
-		uid, err := umw.AuthService.GetUidByIdToken(idToken)
+		uid, err := umw.Auth.GetUidByIdToken(idToken)
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return
