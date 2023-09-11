@@ -19,7 +19,7 @@ func NewFirestoreService(app firebase.App) *FirestoreService {
 
 	return &FirestoreService{
 		OutfitService: &models.OutfitService{
-			Collection: firestore.Collection("outfits"),
+			Client: firestore,
 		},
 	}
 }

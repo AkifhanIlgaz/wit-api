@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 )
 
@@ -33,8 +32,7 @@ type Position struct {
 }
 
 type OutfitService struct {
-	Collection *firestore.CollectionRef
-	Bucket     *storage.BucketHandle
+	Client *firestore.Client
 }
 
 func (service *OutfitService) AddOutfit(outfit *Outfit) error {

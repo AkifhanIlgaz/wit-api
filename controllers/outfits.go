@@ -14,6 +14,8 @@ type OutfitsController struct {
 	OutfitService models.OutfitService
 }
 
+
+
 func (controller *OutfitsController) Add(w http.ResponseWriter, r *http.Request) {
 	var outfit models.Outfit
 
