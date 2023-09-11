@@ -36,7 +36,9 @@ type OutfitService struct {
 }
 
 func (service *OutfitService) AddOutfit(outfit *Outfit) error {
-	doc := service.Collection.NewDoc()
+	collection := service.Client.Collection(outfitCollection)
+
+	doc := collection.NewDoc()
 	outfit.Id = doc.ID
 	outfit.CreatedAt = time.Now()
 	_, err := doc.Set(context.TODO(), outfit)
@@ -48,9 +50,10 @@ func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 }
 
 func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
+	collection := service.Client.Collection(outfitCollection)
 	var outfit Outfit
 	// ! If current user is not the owner of this outfit return error
-	doc := service.Collection.Doc(outfitId)
+	doc := collection.Doc(outfitId)
 	snapshot, err := doc.Get(context.TODO())
 	if err != nil {
 		return fmt.Errorf("delete outfit | get: %w", err)
@@ -75,9 +78,10 @@ func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
 // TODO: Update outfit
 
 func (service *OutfitService) GetAllOutfitsByUid(uid string) ([]Outfit, error) {
+	collection := service.Client.Collection(outfitCollection)
 	outfits := []Outfit{}
 
-	iter := service.Collection.Where("Uid", "==", uid).Documents(context.TODO())
+	iter := collection.Where("Uid", "==", uid).Documents(context.TODO())
 	for {
 		var outfit Outfit
 		doc, err := iter.Next()
@@ -100,9 +104,10 @@ func (service *OutfitService) GetAllOutfitsByUid(uid string) ([]Outfit, error) {
 }
 
 func (service *OutfitService) GetOutfitById(outfitId string) (*Outfit, error) {
+	collection := service.Client.Collection(outfitCollection)
 	var outfit Outfit
 
-	snapshot, err := service.Collection.Doc(outfitId).Get(context.TODO())
+	snapshot, err := collection.Doc(outfitId).Get(context.TODO())
 	if err != nil {
 		return nil, fmt.Errorf("get outfit by id: %w", err)
 	}
