@@ -10,7 +10,6 @@ import (
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
 
@@ -49,9 +48,8 @@ func main() {
 	r.Get("/generate-upload-url", func(w http.ResponseWriter, r *http.Request) {
 		uid := ctx.Uid(r.Context())
 		fileExtension := r.Header.Get("fileExtension")
-		id := uuid.New()
 
-		uploadUrl, err := myApp.StorageService.GenerateUploadUrl(*uid, id.String(), fileExtension)
+		uploadUrl, err := myApp.StorageService.GenerateUploadUrl(*uid, fileExtension)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return

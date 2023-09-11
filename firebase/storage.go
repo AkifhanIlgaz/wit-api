@@ -27,12 +27,13 @@ func NewStorageService(app firebase.App) *StorageService {
 	return &StorageService{Bucket: bucket}
 }
 
-func (service *StorageService) GenerateUploadUrl(uid, id, extension string) (string, error) {
-	objPath := fmt.Sprintf("%s/%s.%s", uid, id, extension)
-
+func (service *StorageService) GenerateUploadUrl(uid, extension string) (string, error) {
+	objPath := fmt.Sprintf("%s/%v.%s", uid, time.Now().UnixMilli(), extension)
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
-		Method:  "PUT",
-		Expires: time.Now().Add(15 * time.Minute),
+		Method:      "PUT",
+		Expires:     time.Now().Add(15 * time.Minute),
+		ContentType: fmt.Sprintf("image/%s", extension),
+		Scheme:      storage.SigningSchemeV4,
 	})
 	if err != nil {
 		return "", fmt.Errorf("generate upload url: %w", err)
