@@ -12,23 +12,17 @@ import (
 const outfitCollection = "outfits"
 
 type Outfit struct {
-	Id        string    `firestore:"id"`
 	Uid       string    `firestore:"uid"`
 	PhotoURL  string    `firestore:"photoURL"`
 	Links     []Link    `firestore:"links"`
-	Likes     []string  `firestore:"likes"`
 	CreatedAt time.Time `firestore:"createdAt"`
 }
 
 type Link struct {
-	Title    string   `firestore:"title"`
-	Href     string   `firestore:"href"`
-	Position Position `firestore:"position"`
-}
-
-type Position struct {
-	Left string `firestore:"left"`
-	Top  string `firestore:"top"`
+	Title string `firestore:"title"`
+	Href  string `firestore:"href"`
+	Left  string `firestore:"left"`
+	Top   string `firestore:"top"`
 }
 
 type OutfitService struct {
@@ -39,8 +33,6 @@ func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 	collection := service.Client.Collection(outfitCollection)
 
 	doc := collection.NewDoc()
-	outfit.Id = doc.ID
-	outfit.CreatedAt = time.Now()
 	_, err := doc.Set(context.TODO(), outfit)
 	if err != nil {
 		return fmt.Errorf("add document: %w", err)

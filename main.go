@@ -1,12 +1,17 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/AkifhanIlgaz/wit-api/controllers"
+	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
+	"github.com/AkifhanIlgaz/wit-api/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -24,6 +29,10 @@ func main() {
 
 	firebaseController := controllers.FirebaseController{
 		Storage: myApp.Storage,
+	}
+
+	outfitService := &models.OutfitService{
+		Client: myApp.Firestore.Client,
 	}
 
 	uidMiddleware := controllers.UidMiddleware{
@@ -45,6 +54,31 @@ func main() {
 	}))
 
 	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
+	r.Post("/add-outfit", func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Please provide body", http.StatusBadRequest)
+			return
+		}
+
+		outfit := models.Outfit{
+			Uid:       *ctx.Uid(r.Context()),
+			CreatedAt: time.Now(),
+		}
+		err = json.Unmarshal(body, &outfit)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+		outfit.PhotoURL = myApp.Storage.GetDownloadUrl(outfit.PhotoURL)
+
+		err = outfitService.AddOutfit(&outfit)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+	})
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
