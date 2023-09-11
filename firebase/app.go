@@ -19,7 +19,7 @@ func NewApp(credentialsFile string) (*MyApp, error) {
 
 	opt := option.WithCredentialsFile(credentialsFile)
 	config := firebase.Config{
-		StorageBucket: "wearittomorrow-ab06f.appspot.com/",
+		StorageBucket: "wearittomorrow-ab06f.appspot.com",
 	}
 
 	app, err := firebase.NewApp(ctx, &config, opt)

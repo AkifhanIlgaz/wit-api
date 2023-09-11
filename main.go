@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/AkifhanIlgaz/wit-api/controllers"
 	"github.com/AkifhanIlgaz/wit-api/ctx"
@@ -48,15 +50,23 @@ func main() {
 	r.Get("/generate-upload-url", func(w http.ResponseWriter, r *http.Request) {
 		uid := ctx.Uid(r.Context())
 		fileExtension := r.Header.Get("fileExtension")
+		timestamp := time.Now().UnixMilli()
 
-		uploadUrl, err := myApp.StorageService.GenerateUploadUrl(*uid, fileExtension)
+		uploadUrl, filePath, err := myApp.StorageService.GenerateUploadUrl(*uid, timestamp, fileExtension)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, uploadUrl)
+		resp := map[string]string{
+			"uploadUrl": uploadUrl,
+			"filePath":  filePath,
+		}
+
+		encoder := json.NewEncoder(w)
+		encoder.Encode(resp)
+
 	})
 
 	r.Route("/outfits", func(r chi.Router) {

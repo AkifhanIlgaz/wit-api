@@ -3,6 +3,7 @@ package firebase
 import (
 	"context"
 	"fmt"
+	"path"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -10,7 +11,8 @@ import (
 )
 
 type StorageService struct {
-	Bucket *storage.BucketHandle
+	BaseUrl string
+	Bucket  *storage.BucketHandle
 }
 
 func NewStorageService(app firebase.App) *StorageService {
@@ -24,11 +26,14 @@ func NewStorageService(app firebase.App) *StorageService {
 		panic(err)
 	}
 
-	return &StorageService{Bucket: bucket}
+	return &StorageService{
+		BaseUrl: "https://storage.cloud.google.com/wearittomorrow-ab06f.appspot.com",
+		Bucket:  bucket}
 }
 
-func (service *StorageService) GenerateUploadUrl(uid, extension string) (string, error) {
-	objPath := fmt.Sprintf("%s/%v.%s", uid, time.Now().UnixMilli(), extension)
+func (service *StorageService) GenerateUploadUrl(uid string, timestamp int64, extension string) (string, string, error) {
+	objPath := fmt.Sprintf("outfits/%s-%v.%s", uid, timestamp, extension)
+
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
 		Method:      "PUT",
 		Expires:     time.Now().Add(15 * time.Minute),
@@ -36,8 +41,12 @@ func (service *StorageService) GenerateUploadUrl(uid, extension string) (string,
 		Scheme:      storage.SigningSchemeV4,
 	})
 	if err != nil {
-		return "", fmt.Errorf("generate upload url: %w", err)
+		return "", "", fmt.Errorf("generate upload url: %w", err)
 	}
 
-	return signedUrl, nil
+	return signedUrl, objPath, nil
+}
+
+func (service *StorageService) GetDownloadUrl(objPath string) string {
+	return path.Join(service.BaseUrl, objPath)
 }
