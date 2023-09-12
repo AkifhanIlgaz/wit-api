@@ -29,7 +29,7 @@ type OutfitService struct {
 	Client *firestore.Client
 }
 
-func (service *OutfitService) AddOutfit(outfit *Outfit) error {
+func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	collection := service.Client.Collection(outfitCollection)
 
 	doc := collection.NewDoc()
@@ -40,6 +40,8 @@ func (service *OutfitService) AddOutfit(outfit *Outfit) error {
 
 	return nil
 }
+
+// *********** OLD ****************
 
 func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
 	collection := service.Client.Collection(outfitCollection)

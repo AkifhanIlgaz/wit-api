@@ -17,6 +17,7 @@ func NewAuth(app firebase.App) *Auth {
 	if err != nil {
 		panic(err)
 	}
+
 	return &Auth{
 		Client: auth,
 	}

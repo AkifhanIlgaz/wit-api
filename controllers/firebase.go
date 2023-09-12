@@ -13,12 +13,12 @@ type FirebaseController struct {
 	Storage *firebase.Storage
 }
 
-func (fc *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r *http.Request) {
+func (controller *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
 	fileExtension := r.Header.Get("fileExtension")
 	timestamp := time.Now().UnixMilli()
 
-	uploadUrl, filePath, err := fc.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension)
+	uploadUrl, filePath, err := controller.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

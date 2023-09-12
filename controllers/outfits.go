@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -17,7 +16,7 @@ type OutfitsController struct {
 	OutfitService *models.OutfitService
 }
 
-func (oc *OutfitsController) AddOutfit(w http.ResponseWriter, r *http.Request) {
+func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Please provide body", http.StatusBadRequest)
@@ -33,11 +32,11 @@ func (oc *OutfitsController) AddOutfit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	outfit.PhotoURL = oc.Storage.GetDownloadUrl(outfit.PhotoURL)
+	outfit.PhotoURL = controller.Storage.GetDownloadUrl(outfit.PhotoURL)
 
-	err = oc.OutfitService.AddOutfit(&outfit)
+	err = controller.OutfitService.AddOutfit(outfit)
 	if err != nil {
-		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 }

@@ -27,6 +27,10 @@ func main() {
 		Client: myApp.Firestore.Client,
 	}
 
+	userService := &models.UserService{
+		Client: myApp.Firestore.Client,
+	}
+
 	uidMiddleware := controllers.UidMiddleware{
 		Auth: myApp.Auth,
 	}
@@ -38,6 +42,10 @@ func main() {
 	outfitsController := controllers.OutfitsController{
 		Storage:       myApp.Storage,
 		OutfitService: outfitService,
+	}
+
+	usersController := controllers.UsersController{
+		UserService: userService,
 	}
 
 	r := chi.NewRouter()
@@ -55,7 +63,8 @@ func main() {
 	}))
 
 	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
-	r.Post("/add-outfit", outfitsController.AddOutfit)
+	r.Post("/outfit/new", outfitsController.NewOutfit)
+	r.Post("/user/new", usersController.NewUser)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
