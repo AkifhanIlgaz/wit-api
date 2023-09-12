@@ -24,11 +24,10 @@ type UserService struct {
 	Auth   *auth.Client
 }
 
-func (service *UserService) AddUser(user User) error {
+func (service *UserService) AddUser(uid string, user User) error {
 	collection := service.Client.Collection(usersCollection)
 
-	doc := collection.NewDoc()
-	_, err := doc.Set(context.TODO(), user)
+	_, err := collection.Doc(uid).Set(context.TODO(), user)
 	if err != nil {
 		return fmt.Errorf("add user: %w", err)
 	}
@@ -51,9 +50,10 @@ func (service *UserService) Follow(currentUid, followedUid string) error {
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("update following: %w", err)
+		return fmt.Errorf("follow | update following: %w", err)
 	}
 
+	// TODO: If an error occurs on second action undo the first action
 	_, err = collection.Doc(followedUid).Update(context.TODO(), []firestore.Update{
 		{
 			Path:  "followers",
@@ -61,8 +61,34 @@ func (service *UserService) Follow(currentUid, followedUid string) error {
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("update followers: %w", err)
+		return fmt.Errorf("follow | update followers: %w", err)
 	}
 
+	return nil
+}
+
+func (service *UserService) Unfollow(currentUid, unfollowedUid string) error {
+	collection := service.Client.Collection(usersCollection)
+
+	_, err := collection.Doc(currentUid).Update(context.TODO(), []firestore.Update{
+		{
+			Path:  "followings",
+			Value: firestore.ArrayRemove(unfollowedUid),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("unfollow | update following: %w", err)
+	}
+
+	// TODO: If an error occurs on second action undo the first action
+	_, err = collection.Doc(unfollowedUid).Update(context.TODO(), []firestore.Update{
+		{
+			Path:  "followers",
+			Value: firestore.ArrayRemove(currentUid),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("unfollow | update followers: %w", err)
+	}
 	return nil
 }

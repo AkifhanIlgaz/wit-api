@@ -65,6 +65,8 @@ func main() {
 	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
 	r.Post("/outfit/new", outfitsController.NewOutfit)
 	r.Post("/user/new", usersController.NewUser)
+	r.Put("/user/follow", usersController.Follow)
+	r.Put("/user/unfollow", usersController.Unfollow)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
