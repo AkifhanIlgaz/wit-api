@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -40,9 +39,7 @@ func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Reques
 
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {
 	currentUid := ctx.Uid(r.Context())
-	followedUid := r.URL.Query().Get("followed-uid")
-
-	fmt.Println("uid: ", followedUid)
+	followedUid := r.FormValue("uid")
 
 	err := controller.UserService.Follow(*currentUid, followedUid)
 	if err != nil {
@@ -55,9 +52,8 @@ func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request
 
 func (controller *UsersController) Unfollow(w http.ResponseWriter, r *http.Request) {
 	currentUid := ctx.Uid(r.Context())
-	unfollowedUid := r.URL.Query().Get("unfollowed-uid")
+	unfollowedUid := r.FormValue("uid")
 
-	fmt.Println("uid: ", unfollowedUid)
 	err := controller.UserService.Unfollow(*currentUid, unfollowedUid)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
