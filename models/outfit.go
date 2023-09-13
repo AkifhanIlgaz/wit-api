@@ -11,10 +11,14 @@ import (
 
 const outfitCollection = "outfits"
 
+// TODO: Change it to 20
+const postNumbersPerRequest = 2
+
 type Outfit struct {
 	Uid       string    `firestore:"uid"`
 	PhotoURL  string    `firestore:"photoURL"`
 	Links     []Link    `firestore:"links"`
+	Likes     []string  `firestore:"likes"`
 	CreatedAt time.Time `firestore:"createdAt"`
 }
 
@@ -39,6 +43,39 @@ func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	}
 
 	return nil
+}
+
+// If lastOutfitTimestamp is not given use time.Now()
+func (service *OutfitService) GetOutfits(uids []string, lastOutfitTimestamp time.Time) ([]Outfit, error) {
+	collection := service.Client.Collection(outfitCollection)
+
+	var filter firestore.OrFilter
+	for _, uid := range uids {
+		filter.Filters = append(filter.Filters, firestore.PropertyFilter{
+			Path:     "uid",
+			Operator: "==",
+			Value:    uid,
+		})
+	}
+
+	outfitSnapshots, err := collection.WhereEntity(filter).OrderBy("createdAt", firestore.Desc).StartAfter(lastOutfitTimestamp).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("get outfits | query: %w", err)
+	}
+
+	var outfits []Outfit
+	for _, snapshot := range outfitSnapshots {
+		var outfit Outfit
+
+		err := snapshot.DataTo(&outfit)
+		if err != nil {
+			return nil, fmt.Errorf("get outfits | data to: %w", err)
+		}
+
+		outfits = append(outfits, outfit)
+	}
+
+	return outfits, nil
 }
 
 // *********** OLD ****************

@@ -35,6 +35,19 @@ func (service *UserService) AddUser(uid string, user User) error {
 	return nil
 }
 
+func (service *UserService) GetUser(uid string) (*User, error) {
+	var user User
+	collection := service.Client.Collection(usersCollection)
+
+	snapshot, err := collection.Doc(uid).Get(context.TODO())
+	if err != nil {
+		return nil, fmt.Errorf("get user: %w", err)
+	}
+	snapshot.DataTo(&user)
+
+	return &user, nil
+}
+
 func (service *UserService) UpdateUser(displayName string, photoUrl string) error {
 	// ? Merge
 	panic("Implement")
