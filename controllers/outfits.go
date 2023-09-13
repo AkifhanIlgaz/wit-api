@@ -53,10 +53,11 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	last, err := convertToTime(r.FormValue("last"))
+	var last time.Time
+
+	last, err = convertToTime(r.FormValue("last"))
 	if err != nil {
-		http.Error(w, "Please provide valid timestamp", http.StatusBadRequest)
-		return
+		last = time.Now()
 	}
 
 	outfits, err := controller.OutfitService.GetOutfits(user.Followings, last)
