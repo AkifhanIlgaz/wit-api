@@ -11,6 +11,7 @@ import (
 	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/AkifhanIlgaz/wit-api/models"
+	"github.com/go-chi/chi/v5"
 )
 
 type OutfitsController struct {
@@ -55,7 +56,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	var last time.Time
 
-	last, err = convertToTime(r.FormValue("last"))
+	last, err = convertToTime(chi.URLParam(r, "last"))
 	if err != nil {
 		last = time.Now()
 	}
@@ -72,7 +73,6 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }
 
 func convertToTime(timestamp string) (time.Time, error) {
