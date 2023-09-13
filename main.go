@@ -42,6 +42,7 @@ func main() {
 	outfitsController := controllers.OutfitsController{
 		Storage:       myApp.Storage,
 		OutfitService: outfitService,
+		UserService:   userService,
 	}
 
 	usersController := controllers.UsersController{
@@ -63,7 +64,10 @@ func main() {
 	}))
 
 	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
+
 	r.Post("/outfit/new", outfitsController.NewOutfit)
+	r.Get("/outfit/home", outfitsController.Home)
+
 	r.Post("/user/new", usersController.NewUser)
 	r.Put("/user/follow", usersController.Follow)
 	r.Put("/user/unfollow", usersController.Unfollow)

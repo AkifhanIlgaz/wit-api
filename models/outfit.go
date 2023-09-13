@@ -45,8 +45,8 @@ func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	return nil
 }
 
-// If lastOutfitTimestamp is not given use time.Now()
-func (service *OutfitService) GetOutfits(uids []string, lastOutfitTimestamp time.Time) ([]Outfit, error) {
+// If last is not given use time.Now()
+func (service *OutfitService) GetOutfits(uids []string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	var filter firestore.OrFilter
@@ -58,7 +58,7 @@ func (service *OutfitService) GetOutfits(uids []string, lastOutfitTimestamp time
 		})
 	}
 
-	outfitSnapshots, err := collection.WhereEntity(filter).OrderBy("createdAt", firestore.Desc).StartAfter(lastOutfitTimestamp).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
+	outfitSnapshots, err := collection.WhereEntity(filter).OrderBy("createdAt", firestore.Desc).StartAfter(last).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("get outfits | query: %w", err)
 	}
