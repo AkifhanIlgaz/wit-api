@@ -16,7 +16,7 @@ const postNumbersPerRequest = 2
 
 type Outfit struct {
 	Uid       string    `firestore:"uid" json:"uid"`
-	PhotoUrl  string    `firestore:"photoURL" json:"photoURL"`
+	PhotoUrl  string    `firestore:"photoUrl" json:"photoUrl"`
 	Links     []Link    `firestore:"links" json:"links"`
 	Likes     []string  `firestore:"likes" json:"likes"`
 	CreatedAt time.Time `firestore:"createdAt" json:"createdAt"`
