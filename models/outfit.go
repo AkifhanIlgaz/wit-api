@@ -12,7 +12,7 @@ import (
 const outfitCollection = "outfits"
 
 // TODO: Change it to 20
-const postNumbersPerRequest = 2
+const postNumbersPerRequest = 3
 
 type Outfit struct {
 	Id        string    `firestore:"-" json:"id"`

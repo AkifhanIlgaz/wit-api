@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/AkifhanIlgaz/wit-api/models"
-	"github.com/go-chi/chi/v5"
 )
 
 type OutfitResp struct {
@@ -62,10 +60,8 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	var last time.Time
 
-	last, err = convertToTime(chi.URLParam(r, "last"))
-	if err != nil {
-		last = time.Now()
-	}
+	last = convertToTime(r.URL.Query().Get("last"))
+	fmt.Println(last)
 
 	outfits, err := controller.OutfitService.GetOutfits(user.Followings, last)
 	if err != nil {
@@ -96,11 +92,11 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 }
 
-func convertToTime(timestamp string) (time.Time, error) {
-	i, err := strconv.ParseInt(timestamp, 10, 64)
+func convertToTime(timestamp string) time.Time {
+	t, err := time.Parse(time.RFC3339, timestamp)
 	if err != nil {
-		return time.Now(), fmt.Errorf("convert to time | parse int : %w", err)
+		t = time.Now()
 	}
 
-	return time.Unix(i, 0), nil
+	return t
 }
