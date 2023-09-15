@@ -14,6 +14,12 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type OutfitResp struct {
+	models.Outfit
+	ProfilePhoto string `json:"profilePhoto"`
+	DisplayName  string `json:"displayName"`
+}
+
 type OutfitsController struct {
 	Storage       *firebase.Storage
 	OutfitService *models.OutfitService
@@ -56,7 +62,6 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	var last time.Time
 
-	// Is pass
 	last, err = convertToTime(chi.URLParam(r, "last"))
 	if err != nil {
 		last = time.Now()
@@ -68,8 +73,23 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	var respBody []OutfitResp
+
+	for _, outfit := range outfits {
+		var resp OutfitResp
+		resp.Outfit = outfit
+		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+		resp.ProfilePhoto = outfitOwner.PhotoUrl
+		resp.DisplayName = outfitOwner.DisplayName
+		respBody = append(respBody, resp)
+	}
+
 	enc := json.NewEncoder(w)
-	if err := enc.Encode(&outfits); err != nil {
+	if err := enc.Encode(&respBody); err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}

@@ -15,6 +15,7 @@ const outfitCollection = "outfits"
 const postNumbersPerRequest = 2
 
 type Outfit struct {
+	Id        string    `firestore:"-" json:"id"`
 	Uid       string    `firestore:"uid" json:"uid"`
 	PhotoUrl  string    `firestore:"photoUrl" json:"photoUrl"`
 	Links     []Link    `firestore:"links" json:"links"`
@@ -45,7 +46,6 @@ func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	return nil
 }
 
-// If last is not given use time.Now()
 func (service *OutfitService) GetOutfits(uids []string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
@@ -67,6 +67,7 @@ func (service *OutfitService) GetOutfits(uids []string, last time.Time) ([]Outfi
 	for _, snapshot := range outfitSnapshots {
 		var outfit Outfit
 
+		outfit.Id = snapshot.Ref.ID
 		err := snapshot.DataTo(&outfit)
 		if err != nil {
 			return nil, fmt.Errorf("get outfits | data to: %w", err)
