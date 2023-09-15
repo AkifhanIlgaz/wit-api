@@ -36,7 +36,7 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	outfit.PhotoURL = controller.Storage.GetDownloadUrl(outfit.PhotoURL)
+	outfit.PhotoUrl = controller.Storage.GetDownloadUrl(outfit.PhotoUrl)
 
 	err = controller.OutfitService.AddOutfit(outfit)
 	if err != nil {
@@ -56,6 +56,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	var last time.Time
 
+	// Is pass
 	last, err = convertToTime(chi.URLParam(r, "last"))
 	if err != nil {
 		last = time.Now()

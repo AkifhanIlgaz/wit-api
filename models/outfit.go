@@ -15,18 +15,18 @@ const outfitCollection = "outfits"
 const postNumbersPerRequest = 2
 
 type Outfit struct {
-	Uid       string    `firestore:"uid"`
-	PhotoURL  string    `firestore:"photoURL"`
-	Links     []Link    `firestore:"links"`
-	Likes     []string  `firestore:"likes"`
-	CreatedAt time.Time `firestore:"createdAt"`
+	Uid       string    `firestore:"uid" json:"uid"`
+	PhotoUrl  string    `firestore:"photoURL" json:"photoURL"`
+	Links     []Link    `firestore:"links" json:"links"`
+	Likes     []string  `firestore:"likes" json:"likes"`
+	CreatedAt time.Time `firestore:"createdAt" json:"createdAt"`
 }
 
 type Link struct {
-	Title string `firestore:"title"`
-	Href  string `firestore:"href"`
-	Left  string `firestore:"left"`
-	Top   string `firestore:"top"`
+	Title string `firestore:"title" json:"title"`
+	Href  string `firestore:"href" json:"href"`
+	Left  string `firestore:"left" json:"left"`
+	Top   string `firestore:"top" json:"top"`
 }
 
 type OutfitService struct {
