@@ -98,6 +98,34 @@ func (service *OutfitService) GetLikeStatus(outfit *Outfit, uid string) (bool, i
 	return slices.Contains[[]string, string](outfit.Likes, uid), len(outfit.Likes)
 }
 
+func (service *OutfitService) Like(outfitId, uid string) error {
+	collection := service.Client.Collection(outfitCollection)
+
+	_, err := collection.Doc(outfitId).Update(context.TODO(), []firestore.Update{{
+		Path:  "likes",
+		Value: firestore.ArrayUnion(uid),
+	}})
+	if err != nil {
+		return fmt.Errorf("like: %w", err)
+	}
+
+	return nil
+}
+
+func (service *OutfitService) Unlike(outfitId, uid string) error {
+	collection := service.Client.Collection(outfitCollection)
+
+	_, err := collection.Doc(outfitId).Update(context.TODO(), []firestore.Update{{
+		Path:  "likes",
+		Value: firestore.ArrayRemove(uid),
+	}})
+	if err != nil {
+		return fmt.Errorf("unlike: %w", err)
+	}
+
+	return nil
+}
+
 // *********** OLD ****************
 
 // func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
