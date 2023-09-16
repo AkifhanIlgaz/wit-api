@@ -94,13 +94,8 @@ func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	return &outfit, nil
 }
 
-func (service *OutfitService) GetLikeStatus(outfitId, uid string) (bool, int, error) {
-	outfit, err := service.GetOutfit(outfitId)
-	if err != nil {
-		return false, 0, fmt.Errorf("get like status: %w", err)
-	}
-
-	return slices.Contains[[]string, string](outfit.Likes, uid), len(outfit.Likes), nil
+func (service *OutfitService) GetLikeStatus(outfit *Outfit, uid string) (bool, int) {
+	return slices.Contains[[]string, string](outfit.Likes, uid), len(outfit.Likes)
 }
 
 // *********** OLD ****************

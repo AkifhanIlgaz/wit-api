@@ -45,6 +45,8 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request) {
 	type response struct {
 		models.Outfit
+		isLiked      bool ``
+		likeCount    int
 		ProfilePhoto string `json:"profilePhoto"`
 		DisplayName  string `json:"displayName"`
 	}
@@ -71,7 +73,11 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	for _, outfit := range outfits {
 		var resp response
+
+		isLiked, likeCount := controller.OutfitService.GetLikeStatus(&outfit, *uid)
 		resp.Outfit = outfit
+		resp.isLiked = isLiked
+		resp.likeCount = likeCount
 		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
