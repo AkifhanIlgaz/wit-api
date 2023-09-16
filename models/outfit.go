@@ -46,7 +46,7 @@ func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	return nil
 }
 
-func (service *OutfitService) GetOutfits(uids []string, last time.Time) ([]Outfit, error) {
+func (service *OutfitService) GetHomeOutfits(uids []string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	var filter firestore.OrFilter

@@ -63,7 +63,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	last = convertToTime(r.URL.Query().Get("last"))
 
-	outfits, err := controller.OutfitService.GetOutfits(user.Followings, last)
+	outfits, err := controller.OutfitService.GetHomeOutfits(user.Followings, last)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
