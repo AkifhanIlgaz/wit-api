@@ -94,22 +94,13 @@ func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	return &outfit, nil
 }
 
-func (service *OutfitService) IsLiked(outfitId, uid string) (bool, error) {
+func (service *OutfitService) GetLikeStatus(outfitId, uid string) (bool, int, error) {
 	outfit, err := service.GetOutfit(outfitId)
 	if err != nil {
-		return false, fmt.Errorf("is liked: %w", err)
+		return false, 0, fmt.Errorf("get like status: %w", err)
 	}
 
-	return slices.Contains[[]string, string](outfit.Likes, uid), nil
-}
-
-func (service *OutfitService) LikeCount(outfitId string) (int, error) {
-	outfit, err := service.GetOutfit(outfitId)
-	if err != nil {
-		return 0, fmt.Errorf("like count: %w", err)
-	}
-
-	return len(outfit.Likes), nil
+	return slices.Contains[[]string, string](outfit.Likes, uid), len(outfit.Likes), nil
 }
 
 // *********** OLD ****************
