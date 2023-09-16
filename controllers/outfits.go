@@ -45,8 +45,9 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request) {
 	type response struct {
 		models.Outfit
-		isLiked      bool ``
-		likeCount    int
+		isLiked      bool   `json:"isLiked"`
+		likeCount    int    `json:"likeCount"`
+		isSaved      bool   `json:"isSaved"`
 		ProfilePhoto string `json:"profilePhoto"`
 		DisplayName  string `json:"displayName"`
 	}
@@ -83,6 +84,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
 		}
+		resp.isSaved = controller.UserService.IsOutfitSaved(outfitOwner.Saved, outfit.Id)
 		resp.ProfilePhoto = outfitOwner.PhotoUrl
 		resp.DisplayName = outfitOwner.DisplayName
 		respBody = append(respBody, resp)

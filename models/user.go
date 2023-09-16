@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"firebase.google.com/go/v4/auth"
+	"golang.org/x/exp/slices"
 )
 
 const usersCollection = "users"
@@ -104,4 +105,8 @@ func (service *UserService) Unfollow(currentUid, unfollowedUid string) error {
 		return fmt.Errorf("unfollow | update followers: %w", err)
 	}
 	return nil
+}
+
+func (service *UserService) IsOutfitSaved(saved []string, outfitId string) bool {
+	return slices.Contains[[]string, string](saved, outfitId)
 }
