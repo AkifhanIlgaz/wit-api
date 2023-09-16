@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -11,12 +10,6 @@ import (
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/AkifhanIlgaz/wit-api/models"
 )
-
-type OutfitResp struct {
-	models.Outfit
-	ProfilePhoto string `json:"profilePhoto"`
-	DisplayName  string `json:"displayName"`
-}
 
 type OutfitsController struct {
 	Storage       *firebase.Storage
@@ -50,6 +43,12 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request) {
+	type response struct {
+		models.Outfit
+		ProfilePhoto string `json:"profilePhoto"`
+		DisplayName  string `json:"displayName"`
+	}
+
 	uid := ctx.Uid(r.Context())
 	user, err := controller.UserService.GetUser(*uid)
 	if err != nil {
@@ -61,7 +60,6 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 	var last time.Time
 
 	last = convertToTime(r.URL.Query().Get("last"))
-	fmt.Println(last)
 
 	outfits, err := controller.OutfitService.GetOutfits(user.Followings, last)
 	if err != nil {
@@ -69,10 +67,10 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var respBody []OutfitResp
+	var respBody []response
 
 	for _, outfit := range outfits {
-		var resp OutfitResp
+		var resp response
 		resp.Outfit = outfit
 		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
 		if err != nil {
