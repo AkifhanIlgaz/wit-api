@@ -107,6 +107,38 @@ func (service *UserService) Unfollow(currentUid, unfollowedUid string) error {
 	return nil
 }
 
+func (service *UserService) SaveOutfit(outfitId, uid string) error {
+	collection := service.Client.Collection(usersCollection)
+
+	_, err := collection.Doc(uid).Update(context.TODO(), []firestore.Update{
+		{
+			Path:  "saved",
+			Value: firestore.ArrayUnion(outfitId),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("save outfit: %w", err)
+	}
+
+	return nil
+}
+
+func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
+	collection := service.Client.Collection(usersCollection)
+
+	_, err := collection.Doc(uid).Update(context.TODO(), []firestore.Update{
+		{
+			Path:  "saved",
+			Value: firestore.ArrayRemove(outfitId),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("unsave outfit: %w", err)
+	}
+
+	return nil
+}
+
 func (service *UserService) IsOutfitSaved(saved []string, outfitId string) bool {
 	return slices.Contains[[]string, string](saved, outfitId)
 }

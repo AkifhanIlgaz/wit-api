@@ -73,6 +73,8 @@ func main() {
 	r.Post("/user/new", usersController.NewUser)
 	r.Put("/user/follow", usersController.Follow)
 	r.Put("/user/unfollow", usersController.Unfollow)
+	r.Put("/user/save-outfit", usersController.SaveOutfit)
+	r.Put("/user/unsave-outfit", usersController.UnsaveOutfit)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)

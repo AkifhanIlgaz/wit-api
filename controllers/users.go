@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -55,6 +56,33 @@ func (controller *UsersController) Unfollow(w http.ResponseWriter, r *http.Reque
 	unfollowedUid := r.FormValue("uid")
 
 	err := controller.UserService.Unfollow(*currentUid, unfollowedUid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (controller *UsersController) SaveOutfit(w http.ResponseWriter, r *http.Request) {
+	uid := ctx.Uid(r.Context())
+	outfitId := r.FormValue("outfitId")
+
+	fmt.Println(outfitId)
+	err := controller.UserService.SaveOutfit(outfitId, *uid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (controller *UsersController) UnsaveOutfit(w http.ResponseWriter, r *http.Request) {
+	uid := ctx.Uid(r.Context())
+	outfitId := r.FormValue("outfitId")
+
+	err := controller.UserService.UnsaveOutfit(outfitId, *uid)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
