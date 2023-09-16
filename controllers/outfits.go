@@ -98,6 +98,32 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 }
 
+func (controller *OutfitsController) Like(w http.ResponseWriter, r *http.Request) {
+	uid := ctx.Uid(r.Context())
+	outfitId := r.FormValue("outfitId")
+
+	err := controller.OutfitService.Like(outfitId, *uid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (controller *OutfitsController) Unlike(w http.ResponseWriter, r *http.Request) {
+	uid := ctx.Uid(r.Context())
+	outfitId := r.FormValue("outfitId")
+
+	err := controller.OutfitService.Unlike(outfitId, *uid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func convertToTime(timestamp string) time.Time {
 	t, err := time.Parse(time.RFC3339, timestamp)
 	if err != nil {
