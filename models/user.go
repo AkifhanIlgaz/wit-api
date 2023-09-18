@@ -139,6 +139,37 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 	return nil
 }
 
+// TODO
+func (service *UserService) GetFollowers(uid string) ([]User, error) {
+	user, err := service.GetUser(uid)
+	if err != nil {
+		return nil, fmt.Errorf("get followers: %w", err)
+	}
+
+	var followers []User
+	for _, uid := range user.Followers {
+		follower, _ := service.GetUser(uid)
+		followers = append(followers, *follower)
+	}
+
+	return followers, nil
+}
+
+// TODO
+func (service *UserService) GetFollowings(uid string) ([]User, error) {
+	user, err := service.GetUser(uid)
+	if err != nil {
+		return nil, fmt.Errorf("get followings: %w", err)
+	}
+
+	var followings []User
+	for _, uid := range user.Followings {
+		following, _ := service.GetUser(uid)
+		followings = append(followings, *following)
+	}
+
+	return followings, nil
+}
 func (service *UserService) IsOutfitSaved(saved []string, outfitId string) bool {
 	return slices.Contains[[]string, string](saved, outfitId)
 }
