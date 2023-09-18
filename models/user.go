@@ -139,7 +139,6 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 	return nil
 }
 
-// TODO
 func (service *UserService) GetFollowers(uid string) ([]User, error) {
 	user, err := service.GetUser(uid)
 	if err != nil {
@@ -155,7 +154,6 @@ func (service *UserService) GetFollowers(uid string) ([]User, error) {
 	return followers, nil
 }
 
-// TODO
 func (service *UserService) GetFollowings(uid string) ([]User, error) {
 	user, err := service.GetUser(uid)
 	if err != nil {
@@ -170,6 +168,11 @@ func (service *UserService) GetFollowings(uid string) ([]User, error) {
 
 	return followings, nil
 }
+
+func (service *UserService) IsFollowed(followers []string, uid string) bool {
+	return slices.Contains[[]string, string](followers, uid)
+}
+
 func (service *UserService) IsOutfitSaved(saved []string, outfitId string) bool {
 	return slices.Contains[[]string, string](saved, outfitId)
 }
