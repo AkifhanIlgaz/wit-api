@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -77,48 +76,8 @@ func main() {
 	r.Put("/user/unfollow", usersController.Unfollow)
 	r.Put("/user/save-outfit", usersController.SaveOutfit)
 	r.Put("/user/unsave-outfit", usersController.UnsaveOutfit)
-	r.Get("/user/followers", func(w http.ResponseWriter, r *http.Request) {
-		uid := r.URL.Query().Get("uid")
-		// user, err := usersController.UserService.GetUser(uid)
-		// if err != nil {
-		// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		// 	return
-		// }
-
-		followers, err := usersController.UserService.GetFollowers(uid, "")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		enc := json.NewEncoder(w)
-		err = enc.Encode(&followers)
-		if err != nil {
-			http.Error(w, "Something went wrong", http.StatusInternalServerError)
-			return
-		}
-	})
-	r.Get("/user/followings", func(w http.ResponseWriter, r *http.Request) {
-		uid := r.URL.Query().Get("uid")
-		// user, err := usersController.UserService.GetUser(uid)
-		// if err != nil {
-		// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		// 	return
-		// }
-
-		followers, err := usersController.UserService.GetFollowings(uid, "")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		enc := json.NewEncoder(w)
-		err = enc.Encode(&followers)
-		if err != nil {
-			http.Error(w, "Something went wrong", http.StatusInternalServerError)
-			return
-		}
-	})
+	r.Get("/user/followers", usersController.Followers)
+	r.Get("/user/followings", usersController.Followings)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)

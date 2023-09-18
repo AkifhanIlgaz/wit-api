@@ -92,84 +92,41 @@ func (controller *UsersController) UnsaveOutfit(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusOK)
 }
 
-// TODO: Sort and limit
 func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
-	user, err := controller.UserService.GetUser(uid)
+	lastFollower := r.URL.Query().Get("lastFollower")
+
+	followers, err := controller.UserService.GetFollowers(uid, lastFollower)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		fmt.Println(err)
 		return
 	}
 
-	type response struct {
-		Uid         string `json:"uid"`
-		PhotoUrl    string `json:"photoUrl"`
-		DisplayName string `json:"displayName"`
-		IsFollowed  bool   `json:"isFollowed"`
-		Count       int    `json:"count"`
-	}
-
-	var respBody []response
-
-	for _, uid := range user.Followers {
-		var resp response
-
-		resp.Uid = uid
-		follower, _ := controller.UserService.GetUser(uid)
-		resp.DisplayName = follower.DisplayName
-		resp.PhotoUrl = follower.PhotoUrl
-		resp.IsFollowed = controller.UserService.IsFollowed(user.Followings, uid)
-		resp.Count = len(user.Followers)
-
-		respBody = append(respBody, resp)
-	}
-
 	enc := json.NewEncoder(w)
-	err = enc.Encode(&respBody)
+	err = enc.Encode(&followers)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 }
 
-// TODO: Sort and limit
 func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
-	user, err := controller.UserService.GetUser(uid)
+	lastFollowing := r.URL.Query().Get("lastFollowing")
+
+	followers, err := controller.UserService.GetFollowings(uid, lastFollowing)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		fmt.Println(err)
 		return
-	}
-
-	type response struct {
-		Uid         string `json:"uid"`
-		PhotoUrl    string `json:"photoUrl"`
-		DisplayName string `json:"displayName"`
-		IsFollowed  bool   `json:"isFollowed"`
-		Count       int    `json:"count"`
-	}
-
-	var respBody []response
-
-	for _, uid := range user.Followings {
-		var resp response
-
-		resp.Uid = uid
-		follower, _ := controller.UserService.GetUser(uid)
-		resp.DisplayName = follower.DisplayName
-		resp.PhotoUrl = follower.PhotoUrl
-		resp.IsFollowed = true
-		resp.Count = len(user.Followings)
-
-		respBody = append(respBody, resp)
 	}
 
 	enc := json.NewEncoder(w)
-	err = enc.Encode(&respBody)
+	err = enc.Encode(&followers)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
