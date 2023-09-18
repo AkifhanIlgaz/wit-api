@@ -19,6 +19,7 @@ type User struct {
 	Followers   []string `firestore:"followers" json:"followers"` // Store followers by uid
 	Followings  []string `firestore:"followings" json:"followings"`
 	Saved       []string `firestore:"saved" json:"saved"`
+	IsFollowed  bool     `firestore:"-" json:"isFollowed"`
 }
 
 type UserService struct {
@@ -141,20 +142,22 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 }
 
 // TODO: Sort and limit
-func (service *UserService) GetFollowers(uid string, last string) ([]User, error) {
+func (service *UserService) GetFollowers(uid, last string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
-	ref, _ := collection.Doc(uid).Get(context.TODO())
 
-	uids, err := ref.DataAt("followers")
+	snapshot, _ := collection.Doc(uid).Get(context.TODO())
+	var user User
+	err := snapshot.DataTo(&user)
 	if err != nil {
-		return nil, fmt.Errorf("get followers | data at: %w", err)
+		return nil, fmt.Errorf("get followings | data to: %w", err)
 	}
 
 	var filter firestore.OrFilter
-	for _, uid := range uids.([]interface{}) {
-		doc, err := collection.Doc(uid.(string)).Get(context.TODO())
+	for _, uid := range user.Followers {
+		doc, err := collection.Doc(uid).Get(context.TODO())
 		if err != nil {
 			fmt.Errorf("get followers | get by uid: %w", err)
+			break
 		}
 		// ! check error
 		displayName, _ := doc.DataAt("displayName")
@@ -173,33 +176,62 @@ func (service *UserService) GetFollowers(uid string, last string) ([]User, error
 
 	var followers []User
 	for _, snapshot := range userSnapshots {
-		var user User
-		snapshot.DataTo(&user)
-		user.Uid = snapshot.Ref.ID
-		followers = append(followers, user)
+		var u User
+		snapshot.DataTo(&u)
+		u.Uid = snapshot.Ref.ID
+		u.IsFollowed = service.IsFollowed(user.Followings, u.Uid)
+		followers = append(followers, u)
 	}
 
 	return followers, nil
 }
 
 // TODO: Sort and limit
-func (service *UserService) GetFollowings(uid string) ([]User, error) {
-	user, err := service.GetUser(uid)
+func (service *UserService) GetFollowings(uid, last string) ([]User, error) {
+	collection := service.Client.Collection(usersCollection)
+
+	snapshot, _ := collection.Doc(uid).Get(context.TODO())
+	var user User
+	err := snapshot.DataTo(&user)
 	if err != nil {
-		return nil, fmt.Errorf("get followings: %w", err)
+		return nil, fmt.Errorf("get followings | data to: %w", err)
+	}
+
+	var filter firestore.OrFilter
+	for _, uid := range user.Followings {
+		doc, err := collection.Doc(uid).Get(context.TODO())
+		if err != nil {
+			break
+		}
+		// ! check error
+		displayName, _ := doc.DataAt("displayName")
+
+		filter.Filters = append(filter.Filters, firestore.PropertyFilter{
+			Path:     "displayName",
+			Operator: "==",
+			Value:    displayName,
+		})
+	}
+
+	userSnapshots, err := collection.WhereEntity(filter).OrderBy("displayName", firestore.Asc).StartAfter(last).Limit(5).Documents(context.TODO()).GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("get followings | query: %w", err)
 	}
 
 	var followings []User
-	for _, uid := range user.Followings {
-		following, _ := service.GetUser(uid)
-		followings = append(followings, *following)
+	for _, snapshot := range userSnapshots {
+		var user User
+		snapshot.DataTo(&user)
+		user.Uid = snapshot.Ref.ID
+		user.IsFollowed = true
+		followings = append(followings, user)
 	}
 
 	return followings, nil
 }
 
-func (service *UserService) IsFollowed(followers []string, uid string) bool {
-	return slices.Contains[[]string, string](followers, uid)
+func (service *UserService) IsFollowed(users []string, uid string) bool {
+	return slices.Contains[[]string, string](users, uid)
 }
 
 func (service *UserService) IsOutfitSaved(saved []string, outfitId string) bool {

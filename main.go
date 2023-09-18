@@ -85,15 +85,7 @@ func main() {
 		// 	return
 		// }
 
-		type response struct {
-			Uid         string `json:"uid"`
-			PhotoUrl    string `json:"photoUrl"`
-			DisplayName string `json:"displayName"`
-			IsFollowed  bool   `json:"isFollowed"`
-			Count       int    `json:"count"`
-		}
-
-		followers, err := usersController.UserService.GetFollowers(uid, "Ula Maty")
+		followers, err := usersController.UserService.GetFollowers(uid, "")
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -106,7 +98,27 @@ func main() {
 			return
 		}
 	})
-	r.Get("/user/followings", usersController.Followings)
+	r.Get("/user/followings", func(w http.ResponseWriter, r *http.Request) {
+		uid := r.URL.Query().Get("uid")
+		// user, err := usersController.UserService.GetUser(uid)
+		// if err != nil {
+		// 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		// 	return
+		// }
+
+		followers, err := usersController.UserService.GetFollowings(uid, "")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		enc := json.NewEncoder(w)
+		err = enc.Encode(&followers)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+	})
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)

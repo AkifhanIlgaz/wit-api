@@ -176,6 +176,8 @@ func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Reques
 	uid := r.URL.Query().Get("uid")
 	lastOutfit := convertToTime(r.URL.Query().Get("lastOutfit"))
 	lastSaved := convertToTime(r.URL.Query().Get("lastSaved"))
+	lastFollower := r.URL.Query().Get("lastFollower")
+	lastFollowing := r.URL.Query().Get("lastFollowing")
 
 	u, err := controller.UserService.GetUser(uid)
 	if err != nil {
@@ -183,20 +185,13 @@ func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	type user struct {
-		Uid         string `json:"uid"`
-		PhotoUrl    string `json:"photoUrl"`
-		DisplayName string `json:"displayName"`
-		IsFollowed  bool   `json:"isFollowed"`
-	}
-
 	type response struct {
 		DisplayName string          `json:"displayName"`
 		PhotoUrl    string          `json:"photoUrl"`
 		Outfits     []models.Outfit `json:"outfits"`
 		Saved       []models.Outfit `json:"saved"`
-		Followers   []user          `json:"followers"`
-		Followings  []user          `json:"followings"`
+		Followers   []models.User   `json:"followers"`
+		Followings  []models.User   `json:"followings"`
 	}
 
 	res := response{
@@ -216,10 +211,17 @@ func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Reques
 	}
 	res.Saved = saved
 
-	// followers, err := controller.UserService.GetFollowers(uid)
-	// if err != nil {
-	// 	// ?
-	// }
+	followers, err := controller.UserService.GetFollowers(uid, lastFollower)
+	if err != nil {
+		// ?
+	}
+	res.Followers = followers
+
+	followings, err := controller.UserService.GetFollowings(uid, lastFollowing)
+	if err != nil {
+		// ?
+	}
+	res.Followings = followings
 
 }
 
