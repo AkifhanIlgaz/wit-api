@@ -79,7 +79,7 @@ func (service *OutfitService) GetHomeOutfits(uids []string, last time.Time) ([]O
 	return outfits, nil
 }
 
-func (service *OutfitService) GetOutfitsByUid(uid string, last time.Time) ([]Outfit, error) {
+func (service *OutfitService) GetUserOutfits(uid string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	snapshots, err := collection.Where("uid", "==", uid).OrderBy("createdAt", firestore.Desc).StartAfter(last).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()

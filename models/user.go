@@ -13,11 +13,12 @@ const usersCollection = "users"
 
 // User stored on Firestore
 type User struct {
-	DisplayName string   `firestore:"displayName"`
-	PhotoUrl    string   `firestore:"photoUrl"`
-	Followers   []string `firestore:"followers"` // Store followers by uid
-	Followings  []string `firestore:"followings"`
-	Saved       []string `firestore:"saved"`
+	Uid         string   `firestore:"-" json:"uid"`
+	DisplayName string   `firestore:"displayName" json:"displayName"`
+	PhotoUrl    string   `firestore:"photoUrl" json:"photoUrl"`
+	Followers   []string `firestore:"followers" json:"followers"` // Store followers by uid
+	Followings  []string `firestore:"followings" json:"followings"`
+	Saved       []string `firestore:"saved" json:"saved"`
 }
 
 type UserService struct {
@@ -140,16 +141,42 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 }
 
 // TODO: Sort and limit
-func (service *UserService) GetFollowers(uid string) ([]User, error) {
-	user, err := service.GetUser(uid)
+func (service *UserService) GetFollowers(uid string, last string) ([]User, error) {
+	collection := service.Client.Collection(usersCollection)
+	ref, _ := collection.Doc(uid).Get(context.TODO())
+
+	uids, err := ref.DataAt("followers")
 	if err != nil {
-		return nil, fmt.Errorf("get followers: %w", err)
+		return nil, fmt.Errorf("get followers | data at: %w", err)
+	}
+
+	var filter firestore.OrFilter
+	for _, uid := range uids.([]interface{}) {
+		doc, err := collection.Doc(uid.(string)).Get(context.TODO())
+		if err != nil {
+			fmt.Errorf("get followers | get by uid: %w", err)
+		}
+		// ! check error
+		displayName, _ := doc.DataAt("displayName")
+
+		filter.Filters = append(filter.Filters, firestore.PropertyFilter{
+			Path:     "displayName",
+			Operator: "==",
+			Value:    displayName,
+		})
+	}
+
+	userSnapshots, err := collection.WhereEntity(filter).OrderBy("displayName", firestore.Asc).StartAfter(last).Limit(5).Documents(context.TODO()).GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("get outfits | query: %w", err)
 	}
 
 	var followers []User
-	for _, uid := range user.Followers {
-		follower, _ := service.GetUser(uid)
-		followers = append(followers, *follower)
+	for _, snapshot := range userSnapshots {
+		var user User
+		snapshot.DataTo(&user)
+		user.Uid = snapshot.Ref.ID
+		followers = append(followers, user)
 	}
 
 	return followers, nil

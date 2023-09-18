@@ -175,6 +175,7 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
 	lastOutfit := convertToTime(r.URL.Query().Get("lastOutfit"))
+	lastSaved := convertToTime(r.URL.Query().Get("lastSaved"))
 
 	u, err := controller.UserService.GetUser(uid)
 	if err != nil {
@@ -203,12 +204,22 @@ func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Reques
 		PhotoUrl:    u.PhotoUrl,
 	}
 
-	outfits, err := controller.OutfitService.GetOutfitsByUid(uid, lastOutfit)
+	outfits, err := controller.OutfitService.GetUserOutfits(uid, lastOutfit)
 	if err != nil {
 		// ?
 	}
-
 	res.Outfits = outfits
+
+	saved, err := controller.OutfitService.GetOutfits(u.Saved, lastSaved)
+	if err != nil {
+		// ?
+	}
+	res.Saved = saved
+
+	// followers, err := controller.UserService.GetFollowers(uid)
+	// if err != nil {
+	// 	// ?
+	// }
 
 }
 
