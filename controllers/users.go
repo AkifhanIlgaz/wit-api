@@ -114,14 +114,14 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 	uid := r.URL.Query().Get("uid")
 	lastFollowing := r.URL.Query().Get("lastFollowing")
 
-	followers, err := controller.UserService.GetFollowings(uid, lastFollowing)
+	followings, err := controller.UserService.GetFollowings(uid, lastFollowing)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	enc := json.NewEncoder(w)
-	err = enc.Encode(&followers)
+	err = enc.Encode(&followings)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
