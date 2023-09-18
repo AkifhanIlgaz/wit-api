@@ -46,7 +46,8 @@ func main() {
 	}
 
 	usersController := controllers.UsersController{
-		UserService: userService,
+		UserService:   userService,
+		OutfitService: outfitService,
 	}
 
 	r := chi.NewRouter()

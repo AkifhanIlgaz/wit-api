@@ -139,6 +139,7 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 	return nil
 }
 
+// TODO: Sort and limit
 func (service *UserService) GetFollowers(uid string) ([]User, error) {
 	user, err := service.GetUser(uid)
 	if err != nil {
@@ -154,6 +155,7 @@ func (service *UserService) GetFollowers(uid string) ([]User, error) {
 	return followers, nil
 }
 
+// TODO: Sort and limit
 func (service *UserService) GetFollowings(uid string) ([]User, error) {
 	user, err := service.GetUser(uid)
 	if err != nil {

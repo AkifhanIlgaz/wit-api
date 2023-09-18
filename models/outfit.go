@@ -79,6 +79,30 @@ func (service *OutfitService) GetHomeOutfits(uids []string, last time.Time) ([]O
 	return outfits, nil
 }
 
+func (service *OutfitService) GetOutfitsByUid(uid string, last time.Time) ([]Outfit, error) {
+	collection := service.Client.Collection(outfitCollection)
+
+	snapshots, err := collection.Where("uid", "==", uid).OrderBy("createdAt", firestore.Desc).StartAfter(last).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("get outfits by uid: %w", err)
+	}
+
+	var outfits []Outfit
+	for _, snapshot := range snapshots {
+		var outfit Outfit
+
+		outfit.Id = snapshot.Ref.ID
+		err := snapshot.DataTo(&outfit)
+		if err != nil {
+			return nil, fmt.Errorf("get outfits | data to: %w", err)
+		}
+
+		outfits = append(outfits, outfit)
+	}
+
+	return nil, nil
+}
+
 func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	var outfit Outfit
 
@@ -92,6 +116,10 @@ func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	outfit.Id = snapshot.Ref.ID
 
 	return &outfit, nil
+}
+
+func (service *OutfitService) GetOutfits(outfitIds []string) ([]Outfit, error) {
+	return nil, nil
 }
 
 func (service *OutfitService) GetLikeStatus(outfit *Outfit, uid string) (bool, int) {

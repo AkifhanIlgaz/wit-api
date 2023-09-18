@@ -12,7 +12,8 @@ import (
 )
 
 type UsersController struct {
-	UserService *models.UserService
+	UserService   *models.UserService
+	OutfitService *models.OutfitService
 }
 
 func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +92,7 @@ func (controller *UsersController) UnsaveOutfit(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusOK)
 }
 
+// TODO: Sort and limit
 func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
 	user, err := controller.UserService.GetUser(uid)
@@ -130,6 +132,7 @@ func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// TODO: Sort and limit
 func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
 	user, err := controller.UserService.GetUser(uid)
@@ -167,6 +170,46 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
+	uid := r.URL.Query().Get("uid")
+	lastOutfit := convertToTime(r.URL.Query().Get("lastOutfit"))
+
+	u, err := controller.UserService.GetUser(uid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	type user struct {
+		Uid         string `json:"uid"`
+		PhotoUrl    string `json:"photoUrl"`
+		DisplayName string `json:"displayName"`
+		IsFollowed  bool   `json:"isFollowed"`
+	}
+
+	type response struct {
+		DisplayName string          `json:"displayName"`
+		PhotoUrl    string          `json:"photoUrl"`
+		Outfits     []models.Outfit `json:"outfits"`
+		Saved       []models.Outfit `json:"saved"`
+		Followers   []user          `json:"followers"`
+		Followings  []user          `json:"followings"`
+	}
+
+	res := response{
+		DisplayName: u.DisplayName,
+		PhotoUrl:    u.PhotoUrl,
+	}
+
+	outfits, err := controller.OutfitService.GetOutfitsByUid(uid, lastOutfit)
+	if err != nil {
+		// ?
+	}
+
+	res.Outfits = outfits
+
 }
 
 type UidMiddleware struct {
