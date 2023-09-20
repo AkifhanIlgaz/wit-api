@@ -118,34 +118,26 @@ func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	return &outfit, nil
 }
 
-func (service *OutfitService) GetOutfits(outfitIds []string, last time.Time) ([]Outfit, error) {
+func (service *OutfitService) GetOutfits(outfitIds []string) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
-
-	var filter firestore.OrFilter
-	for _, id := range outfitIds {
-		filter.Filters = append(filter.Filters, firestore.PropertyFilter{
-			Path:     firestore.DocumentID,
-			Operator: "==",
-			Value:    id,
-		})
-	}
-
-	snapshots, err := collection.WhereEntity(filter).OrderBy("createdAt", firestore.Desc).StartAfter(last).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
-	if err != nil {
-		return nil, fmt.Errorf("get outfits by uid: %w", err)
-	}
-
 	var outfits []Outfit
-	for _, snapshot := range snapshots {
+
+	for _, id := range outfitIds {
 		var outfit Outfit
 
+		snapshot, err := collection.Doc(id).Get(context.TODO())
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
 		outfit.Id = snapshot.Ref.ID
-		err := snapshot.DataTo(&outfit)
+		err = snapshot.DataTo(&outfit)
 		if err != nil {
 			return nil, fmt.Errorf("get outfits | data to: %w", err)
 		}
 
 		outfits = append(outfits, outfit)
+
 	}
 
 	return outfits, nil

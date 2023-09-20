@@ -79,8 +79,7 @@ func main() {
 	r.Put("/user/unsave-outfit", usersController.UnsaveOutfit)
 	r.Get("/user/followers", usersController.Followers)
 	r.Get("/user/followings", usersController.Followings)
-
-	r.Get("/user", usersController.GetUser)
+	r.Get("/user/saved", usersController.Saved)
 
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)

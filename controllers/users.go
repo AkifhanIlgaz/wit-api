@@ -10,6 +10,7 @@ import (
 	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/AkifhanIlgaz/wit-api/models"
+	"golang.org/x/exp/slices"
 )
 
 type UsersController struct {
@@ -67,8 +68,39 @@ func (controller *UsersController) Unfollow(w http.ResponseWriter, r *http.Reque
 }
 
 func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request) {
-	// uid := ctx.Uid(r.Context())
-	// last := r.URL.Query().Get("last")
+	uid := ctx.Uid(r.Context())
+	user, err := controller.UserService.GetUser(*uid)
+
+	var outfitIds []string
+	last := r.URL.Query().Get("last")
+	if last == "" {
+		if len(user.Saved) >= 5 {
+			outfitIds = user.Saved[:5]
+		} else {
+			outfitIds = user.Saved[:]
+		}
+	} else {
+		index := slices.Index(user.Saved, last)
+		if index+5 < len(user.Saved) {
+			outfitIds = user.Saved[index+1 : index+6]
+		} else {
+			outfitIds = user.Saved[index+1:]
+		}
+	}
+	saved, err := controller.OutfitService.GetOutfits(outfitIds)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(saved)
+
+	enc := json.NewEncoder(w)
+	err = enc.Encode(&saved)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 
 }
 
@@ -128,66 +160,6 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 
 	enc := json.NewEncoder(w)
 	err = enc.Encode(&followings)
-	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-}
-
-func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
-	uid := r.URL.Query().Get("uid")
-	lastOutfit := convertToTime(r.URL.Query().Get("lastOutfit"))
-	lastSaved := convertToTime(r.URL.Query().Get("lastSaved"))
-	lastFollower := r.URL.Query().Get("lastFollower")
-	lastFollowing := r.URL.Query().Get("lastFollowing")
-
-	u, err := controller.UserService.GetUser(uid)
-	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	type response struct {
-		DisplayName string          `json:"displayName"`
-		PhotoUrl    string          `json:"photoUrl"`
-		Outfits     []models.Outfit `json:"outfits"`
-		Saved       []models.Outfit `json:"saved"`
-		Followers   []models.User   `json:"followers"`
-		Followings  []models.User   `json:"followings"`
-	}
-
-	res := response{
-		DisplayName: u.DisplayName,
-		PhotoUrl:    u.PhotoUrl,
-	}
-
-	outfits, err := controller.OutfitService.GetUserOutfits(uid, lastOutfit)
-	if err != nil {
-		// ?
-	}
-	res.Outfits = outfits
-
-	saved, err := controller.OutfitService.GetOutfits(u.Saved, lastSaved)
-	if err != nil {
-		// ?
-	}
-	res.Saved = saved
-
-	followers, err := controller.UserService.GetFollowers(uid, lastFollower)
-	if err != nil {
-		// ?
-	}
-	res.Followers = followers
-
-	followings, err := controller.UserService.GetFollowings(uid, lastFollowing)
-	if err != nil {
-		// ?
-	}
-	res.Followings = followings
-
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(&res)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

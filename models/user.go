@@ -23,11 +23,6 @@ type User struct {
 	IsFollowed  bool     `firestore:"-" json:"isFollowed"`
 }
 
-type Saved struct {
-	OutfitId string    `firestore:"outfitId" json:"outfitId"`
-	SavedAt  time.Time `firestore:"savedAt" json:"savedAt"`
-}
-
 type UserService struct {
 	Client *firestore.Client
 	Auth   *auth.Client
@@ -118,15 +113,10 @@ func (service *UserService) Unfollow(currentUid, unfollowedUid string) error {
 func (service *UserService) SaveOutfit(outfitId, uid string, savedAt time.Time) error {
 	collection := service.Client.Collection(usersCollection)
 
-	saved := Saved{
-		OutfitId: outfitId,
-		SavedAt:  savedAt,
-	}
-
 	_, err := collection.Doc(uid).Update(context.TODO(), []firestore.Update{
 		{
 			Path:  "saved",
-			Value: firestore.ArrayUnion(saved),
+			Value: firestore.ArrayUnion(outfitId),
 		},
 	})
 	if err != nil {
