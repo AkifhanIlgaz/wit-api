@@ -17,6 +17,15 @@ type OutfitsController struct {
 	UserService   *models.UserService
 }
 
+type outfitResponse struct {
+	models.Outfit
+	IsLiked      bool   `json:"isLiked"`
+	LikeCount    int    `json:"likeCount"`
+	IsSaved      bool   `json:"isSaved"`
+	ProfilePhoto string `json:"profilePhoto"`
+	DisplayName  string `json:"displayName"`
+}
+
 func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -43,15 +52,6 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request) {
-	type response struct {
-		models.Outfit
-		IsLiked      bool   `json:"isLiked"`
-		LikeCount    int    `json:"likeCount"`
-		IsSaved      bool   `json:"isSaved"`
-		ProfilePhoto string `json:"profilePhoto"`
-		DisplayName  string `json:"displayName"`
-	}
-
 	uid := ctx.Uid(r.Context())
 	user, err := controller.UserService.GetUser(*uid)
 	if err != nil {
@@ -60,9 +60,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var last time.Time
-
-	last = convertToTime(r.URL.Query().Get("last"))
+	last := convertToTime(r.URL.Query().Get("last"))
 
 	outfits, err := controller.OutfitService.GetHomeOutfits(user.Followings, last)
 	if err != nil {
@@ -70,10 +68,10 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var respBody []response
+	var respBody []outfitResponse
 
 	for _, outfit := range outfits {
-		var resp response
+		var resp outfitResponse
 
 		isLiked, likeCount := controller.OutfitService.GetLikeStatus(&outfit, *uid)
 		resp.Outfit = outfit
@@ -96,6 +94,53 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+}
+
+func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request) {
+	uid := r.URL.Query().Get("uid")
+	if uid == "" {
+		http.Error(w, "User doesn't exist", http.StatusBadRequest)
+		return
+	}
+	user, err := controller.UserService.GetUser(uid)
+	if err != nil {
+		// TODO: Check if user not exist or there was an error with firestore
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	last := convertToTime(r.URL.Query().Get("last"))
+	outfits, err := controller.OutfitService.GetUserOutfits(uid, last)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	var respBody []outfitResponse
+
+	for _, outfit := range outfits {
+		var resp outfitResponse
+
+		isLiked, likeCount := controller.OutfitService.GetLikeStatus(&outfit, uid)
+		resp.Outfit = outfit
+		resp.IsLiked = isLiked
+		resp.LikeCount = likeCount
+		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
+		if err != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+		resp.IsSaved = controller.UserService.IsOutfitSaved(user.Saved, outfit.Id)
+		resp.ProfilePhoto = outfitOwner.PhotoUrl
+		resp.DisplayName = outfitOwner.DisplayName
+		respBody = append(respBody, resp)
+	}
+
+	enc := json.NewEncoder(w)
+	if err := enc.Encode(&respBody); err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (controller *OutfitsController) Like(w http.ResponseWriter, r *http.Request) {

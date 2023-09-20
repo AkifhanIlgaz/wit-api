@@ -131,7 +131,6 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 
 func (controller *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
-	fmt.Println("uid", uid)
 	lastOutfit := convertToTime(r.URL.Query().Get("lastOutfit"))
 	lastSaved := convertToTime(r.URL.Query().Get("lastSaved"))
 	lastFollower := r.URL.Query().Get("lastFollower")
