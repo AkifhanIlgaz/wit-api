@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/AkifhanIlgaz/wit-api/ctx"
 	"github.com/AkifhanIlgaz/wit-api/firebase"
@@ -65,12 +66,17 @@ func (controller *UsersController) Unfollow(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusOK)
 }
 
+func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request) {
+	// uid := ctx.Uid(r.Context())
+	// last := r.URL.Query().Get("last")
+
+}
+
 func (controller *UsersController) SaveOutfit(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
 	outfitId := r.FormValue("outfitId")
 
-	fmt.Println(outfitId)
-	err := controller.UserService.SaveOutfit(outfitId, *uid)
+	err := controller.UserService.SaveOutfit(outfitId, *uid, time.Now())
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
