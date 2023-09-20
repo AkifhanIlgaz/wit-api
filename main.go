@@ -79,6 +79,8 @@ func main() {
 	r.Get("/user/followers", usersController.Followers)
 	r.Get("/user/followings", usersController.Followings)
 
+	r.Get("/user", usersController.GetUser)
+
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
 

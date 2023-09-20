@@ -18,7 +18,7 @@ type User struct {
 	PhotoUrl    string   `firestore:"photoUrl" json:"photoUrl"`
 	Followers   []string `firestore:"followers" json:"followers"` // Store followers by uid
 	Followings  []string `firestore:"followings" json:"followings"`
-	Saved       []string `firestore:"saved" json:"saved"`
+	Saved       []string `firestore:"saved" json:"-"`
 	IsFollowed  bool     `firestore:"-" json:"isFollowed"`
 }
 

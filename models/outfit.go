@@ -100,7 +100,7 @@ func (service *OutfitService) GetUserOutfits(uid string, last time.Time) ([]Outf
 		outfits = append(outfits, outfit)
 	}
 
-	return nil, nil
+	return outfits, nil
 }
 
 func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
