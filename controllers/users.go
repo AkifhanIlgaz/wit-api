@@ -93,7 +93,6 @@ func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(saved)
 
 	enc := json.NewEncoder(w)
 	err = enc.Encode(&saved)
@@ -132,7 +131,7 @@ func (controller *UsersController) UnsaveOutfit(w http.ResponseWriter, r *http.R
 
 func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
-	lastFollower := r.URL.Query().Get("lastFollower")
+	lastFollower := r.URL.Query().Get("last")
 
 	followers, err := controller.UserService.GetFollowers(uid, lastFollower)
 	if err != nil {
