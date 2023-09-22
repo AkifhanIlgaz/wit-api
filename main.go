@@ -73,6 +73,7 @@ func main() {
 	r.Get("/outfit/all", outfitsController.All)
 
 	r.Post("/user/new", usersController.NewUser)
+
 	r.Put("/user/follow", usersController.Follow)
 	r.Put("/user/unfollow", usersController.Unfollow)
 	r.Put("/user/save-outfit", usersController.SaveOutfit)
@@ -80,7 +81,7 @@ func main() {
 	r.Get("/user/followers", usersController.Followers)
 	r.Get("/user/followings", usersController.Followings)
 	r.Get("/user/saved", usersController.Saved)
-
+	r.Get("/user", usersController.User)
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
 

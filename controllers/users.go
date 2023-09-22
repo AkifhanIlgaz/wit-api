@@ -18,6 +18,25 @@ type UsersController struct {
 	OutfitService *models.OutfitService
 }
 
+func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) {
+	uid := ctx.Uid(r.Context())
+	user, err := controller.UserService.GetUser(r.URL.Query().Get("uid"))
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	user.IsFollowed = controller.UserService.IsFollowed(user.Followers, *uid)
+
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(&user)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+}
+
 func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
 
