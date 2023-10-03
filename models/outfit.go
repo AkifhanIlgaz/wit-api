@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/firestore/apiv1/firestorepb"
 	"golang.org/x/exp/slices"
 )
 
@@ -141,6 +142,25 @@ func (service *OutfitService) GetOutfits(outfitIds []string) ([]Outfit, error) {
 	}
 
 	return outfits, nil
+}
+
+func (service *OutfitService) GetOutfitCountOfUser(uid string) (int, error) {
+	collection := service.Client.Collection(outfitCollection)
+
+	query := collection.Where("uid", "==", uid)
+	aggregationQuery := query.NewAggregationQuery().WithCount("all")
+	results, err := aggregationQuery.Get(context.Background())
+	if err != nil {
+		return 0, fmt.Errorf("get outfit count of user: %w", err)
+	}
+
+	count, ok := results["all"]
+	if !ok {
+		return 0, fmt.Errorf("get outfit count of user: %w", err)
+	}
+	countValue := count.(*firestorepb.Value)
+
+	return int(countValue.GetIntegerValue()), nil
 }
 
 func (service *OutfitService) GetLikeStatus(outfit *Outfit, uid string) (bool, int) {

@@ -96,6 +96,32 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 }
 
+func (controller *OutfitsController) Count(w http.ResponseWriter, r *http.Request) {
+	uid := r.URL.Query().Get("uid")
+	if uid == "" {
+		http.Error(w, "User doesn't exist", http.StatusBadRequest)
+		return
+	}
+
+	count, err := controller.OutfitService.GetOutfitCountOfUser(uid)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	respBody := struct {
+		OutfitCount int `json:"outfitCount"`
+	}{
+		OutfitCount: count,
+	}
+
+	enc := json.NewEncoder(w)
+	if err := enc.Encode(&respBody); err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("uid")
 	if uid == "" {

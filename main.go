@@ -71,6 +71,7 @@ func main() {
 	r.Put("/outfit/like", outfitsController.Like)
 	r.Put("/outfit/unlike", outfitsController.Unlike)
 	r.Get("/outfit/all", outfitsController.All)
+	r.Get("/outfit/count", outfitsController.Count)
 
 	r.Post("/user/new", usersController.NewUser)
 	r.Put("/user/follow", usersController.Follow)
