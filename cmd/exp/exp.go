@@ -25,4 +25,17 @@ func main() {
 
 	fmt.Println(outfitService.GetOutfitCountOfUser("xQFQncknojU5vUnsmIl2bIevBdE2"))
 
+	fmt.Println(x("outfit"))
+
+}
+
+func x(fileType string) string {
+	var dir string
+
+	switch fileType {
+	case "outfit":
+		return "outfits"
+	}
+	return dir
+
 }

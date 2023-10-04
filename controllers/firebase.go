@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -15,10 +16,17 @@ type FirebaseController struct {
 
 func (controller *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
+	dir, err := storageDirByType(r.Header.Get("type"))
+	if err != nil {
+		http.Error(w, "Please provide valid type", http.StatusBadRequest)
+		return
+	}
+
 	fileExtension := r.Header.Get("fileExtension")
+
 	timestamp := time.Now().UnixMilli()
 
-	uploadUrl, filePath, err := controller.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension)
+	uploadUrl, filePath, err := controller.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension, dir)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -32,4 +40,15 @@ func (controller *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(resp)
+}
+
+func storageDirByType(t string) (string, error) {
+	switch t {
+	case "outfit":
+		return "outfits", nil
+	case "profilePhoto":
+		return "profilePhotos", nil
+	default:
+		return "", fmt.Errorf("storage dir by type: wrong type")
+	}
 }

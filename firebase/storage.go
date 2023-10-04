@@ -31,8 +31,8 @@ func NewStorage(app firebase.App) *Storage {
 		Bucket:  bucket}
 }
 
-func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, extension string) (string, string, error) {
-	objPath := fmt.Sprintf("outfits/%s-%v.%s", uid, timestamp, extension)
+func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, extension string, dir string) (string, string, error) {
+	objPath := fmt.Sprintf("%s/%s-%v.%s", dir, uid, timestamp, extension)
 
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
 		Method:      "PUT",

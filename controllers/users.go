@@ -27,7 +27,6 @@ func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) 
 	}
 
 	user.IsFollowed = controller.UserService.IsFollowed(user.Followers, *uid)
-
 	encoder := json.NewEncoder(w)
 	err = encoder.Encode(&user)
 	if err != nil {
