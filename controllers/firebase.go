@@ -22,11 +22,11 @@ func (controller *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r
 		return
 	}
 
-	fileExtension := r.Header.Get("fileExtension")
+	fileType := r.Header.Get("fileType")
 
 	timestamp := time.Now().UnixMilli()
 
-	uploadUrl, filePath, err := controller.Storage.GenerateUploadUrl(*uid, timestamp, fileExtension, dir)
+	uploadUrl, filePath, err := controller.Storage.GenerateUploadUrl(*uid, timestamp, fileType, dir)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

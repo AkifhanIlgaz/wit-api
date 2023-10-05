@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -31,13 +32,13 @@ func NewStorage(app firebase.App) *Storage {
 		Bucket:  bucket}
 }
 
-func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, extension string, dir string) (string, string, error) {
-	objPath := fmt.Sprintf("%s/%s-%v.%s", dir, uid, timestamp, extension)
+func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, fileType string, dir string) (string, string, error) {
+	objPath := fmt.Sprintf("%s/%s-%v.%s", dir, uid, timestamp, strings.Split(fileType, "/")[1])
 
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
 		Method:      "PUT",
 		Expires:     time.Now().Add(15 * time.Minute),
-		ContentType: extension,
+		ContentType: fileType,
 		Scheme:      storage.SigningSchemeV4,
 	})
 	if err != nil {
