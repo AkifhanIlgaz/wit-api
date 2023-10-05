@@ -37,7 +37,7 @@ func (service *Storage) GenerateUploadUrl(uid string, timestamp int64, extension
 	signedUrl, err := service.Bucket.SignedURL(objPath, &storage.SignedURLOptions{
 		Method:      "PUT",
 		Expires:     time.Now().Add(15 * time.Minute),
-		ContentType: fmt.Sprintf("image/%s", extension),
+		ContentType: extension,
 		Scheme:      storage.SigningSchemeV4,
 	})
 	if err != nil {
