@@ -82,6 +82,7 @@ func main() {
 	r.Get("/user/followings", usersController.Followings)
 	r.Get("/user/saved", usersController.Saved)
 	r.Get("/user/", usersController.User)
+	r.Put("/user/update-profile-photo", usersController.UpdateProfilePhoto)
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
 

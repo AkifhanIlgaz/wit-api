@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/AkifhanIlgaz/wit-api/firebase"
-	"github.com/AkifhanIlgaz/wit-api/models"
 	"github.com/joho/godotenv"
 )
 
@@ -19,13 +17,7 @@ func main() {
 		panic(err)
 	}
 
-	outfitService := &models.OutfitService{
-		Client: myApp.Firestore.Client,
-	}
-
-	fmt.Println(outfitService.GetOutfitCountOfUser("xQFQncknojU5vUnsmIl2bIevBdE2"))
-
-	fmt.Println(x("outfit"))
+	myApp.Auth.UpdateProfilePhoto("xQFQncknojU5vUnsmIl2bIevBdE2", "https://lh3.googleusercontent.com/a/ACg8ocI66bKaZPTj_ZzGiuajojbqzkTAeFyyCVg15CRLAUFj=s96-c")
 
 }
 

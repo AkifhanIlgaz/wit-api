@@ -31,3 +31,15 @@ func (auth *Auth) GetUidByIdToken(idToken string) (string, error) {
 
 	return token.UID, nil
 }
+
+func (a *Auth) UpdateProfilePhoto(uid string, photoUrl string) error {
+	var user auth.UserToUpdate
+	user = *user.PhotoURL(photoUrl)
+
+	u, err := a.Client.UpdateUser(context.TODO(), uid, &user)
+	fmt.Printf("%+v", u.UserInfo)
+
+	fmt.Println(err)
+
+	return nil
+}

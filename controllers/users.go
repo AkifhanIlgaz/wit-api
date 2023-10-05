@@ -59,6 +59,12 @@ func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *http.Request) {
+	// TODO: Update auth
+
+	// TODO: Update firestore
+}
+
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {
 	currentUid := ctx.Uid(r.Context())
 	followedUid := r.FormValue("uid")
