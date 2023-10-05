@@ -71,7 +71,8 @@ func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *
 	}
 
 	var res struct {
-		PhotoUrl string `json:"photoUrl"`
+		PhotoUrl    string `json:"photoUrl"`
+		DisplayName string `json:"displayName"`
 	}
 
 	err = json.Unmarshal(body, &res)
@@ -83,11 +84,15 @@ func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *
 
 	err = controller.Auth.UpdateProfilePhoto(*uid, res.PhotoUrl)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
+	err = controller.UserService.UpdateUser(*uid, res.DisplayName, res.PhotoUrl)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 	// TODO: Update firestore
 }
 

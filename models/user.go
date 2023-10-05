@@ -52,9 +52,28 @@ func (service *UserService) GetUser(uid string) (*User, error) {
 	return &user, nil
 }
 
-func (service *UserService) UpdateUser(displayName string, photoUrl string) error {
-	// ? Merge
-	panic("Implement")
+func (service *UserService) UpdateUser(uid, displayName, photoUrl string) error {
+	collection := service.Client.Collection(usersCollection)
+
+	var updates []firestore.Update
+
+	if displayName != "" {
+		updates = append(updates, firestore.Update{
+			Path:  "displayName",
+			Value: displayName})
+	}
+	if photoUrl != "" {
+		updates = append(updates, firestore.Update{
+			Path:  "photoUrl",
+			Value: photoUrl})
+	}
+
+	_, err := collection.Doc(uid).Update(context.TODO(), updates)
+	if err != nil {
+		return fmt.Errorf("update user: %w", err)
+	}
+
+	return nil
 }
 
 func (service *UserService) Follow(currentUid, followedUid string) error {
