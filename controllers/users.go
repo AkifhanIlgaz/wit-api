@@ -61,7 +61,7 @@ func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *http.Request) {
+func (controller *UsersController) Update(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
 
 	body, err := io.ReadAll(r.Body)
@@ -82,7 +82,7 @@ func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *
 	}
 	res.PhotoUrl = controller.Storage.GetDownloadUrl(res.PhotoUrl)
 
-	err = controller.Auth.UpdateProfilePhoto(*uid, res.PhotoUrl)
+	err = controller.Auth.UpdateUser(*uid, res.PhotoUrl, res.DisplayName)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -93,7 +93,7 @@ func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
-	// TODO: Update firestore
+
 }
 
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {

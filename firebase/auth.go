@@ -32,13 +32,18 @@ func (auth *Auth) GetUidByIdToken(idToken string) (string, error) {
 	return token.UID, nil
 }
 
-func (a *Auth) UpdateProfilePhoto(uid string, photoUrl string) error {
+func (a *Auth) UpdateUser(uid, photoUrl, displayName string) error {
 	var user auth.UserToUpdate
-	user = *(user.PhotoURL(photoUrl))
+	if photoUrl != "" {
+		user = *(user.PhotoURL(photoUrl))
+	}
+	if displayName != "" {
+		user = *(user.PhotoURL(displayName))
+	}
 
 	_, err := a.Client.UpdateUser(context.TODO(), uid, &user)
 	if err != nil {
-		return fmt.Errorf("update profile photo: %w", err)
+		return fmt.Errorf("update user: %w", err)
 	}
 
 	return nil
