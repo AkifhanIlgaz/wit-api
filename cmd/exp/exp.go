@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 
 	"github.com/AkifhanIlgaz/wit-api/firebase"
@@ -17,8 +19,9 @@ func main() {
 		panic(err)
 	}
 
-	myApp.Auth.UpdateProfilePhoto("xQFQncknojU5vUnsmIl2bIevBdE2", "https://lh3.googleusercontent.com/a/ACg8ocI66bKaZPTj_ZzGiuajojbqzkTAeFyyCVg15CRLAUFj=s96-c")
+	u, err := myApp.Auth.Client.GetUser(context.TODO(), "xQFQncknojU5vUnsmIl2bIevBdE2")
 
+	fmt.Println(u.UserInfo.PhotoURL)
 }
 
 func x(fileType string) string {

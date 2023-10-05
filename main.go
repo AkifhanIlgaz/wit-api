@@ -48,6 +48,8 @@ func main() {
 	usersController := controllers.UsersController{
 		UserService:   userService,
 		OutfitService: outfitService,
+		Auth:          myApp.Auth,
+		Storage:       myApp.Storage,
 	}
 
 	r := chi.NewRouter()

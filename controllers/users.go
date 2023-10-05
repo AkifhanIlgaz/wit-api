@@ -16,6 +16,8 @@ import (
 type UsersController struct {
 	UserService   *models.UserService
 	OutfitService *models.OutfitService
+	Auth          *firebase.Auth
+	Storage       *firebase.Storage
 }
 
 func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +62,31 @@ func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Reques
 }
 
 func (controller *UsersController) UpdateProfilePhoto(w http.ResponseWriter, r *http.Request) {
-	// TODO: Update auth
+	uid := ctx.Uid(r.Context())
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Please provide body", http.StatusBadRequest)
+		return
+	}
+
+	var res struct {
+		PhotoUrl string `json:"photoUrl"`
+	}
+
+	err = json.Unmarshal(body, &res)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	res.PhotoUrl = controller.Storage.GetDownloadUrl(res.PhotoUrl)
+
+	err = controller.Auth.UpdateProfilePhoto(*uid, res.PhotoUrl)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 
 	// TODO: Update firestore
 }
