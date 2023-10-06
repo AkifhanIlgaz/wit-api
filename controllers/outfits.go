@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -193,6 +194,38 @@ func (controller *OutfitsController) Unlike(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (controller *OutfitsController) RemoveLink(w http.ResponseWriter, r *http.Request) {
+
+	outfitId := r.URL.Query().Get("outfitId")
+
+	fmt.Println(outfitId)
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Please provide body", http.StatusBadRequest)
+		return
+	}
+
+	var link models.Link
+
+	err = json.Unmarshal(body, &link)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("%+v\n", link)
+
+	err = controller.OutfitService.RemoveLink(outfitId, link)
+	fmt.Println(err)
+
+}
+
+func (controller *OutfitsController) UpdateLink(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func convertToTime(timestamp string) time.Time {

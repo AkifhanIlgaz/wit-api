@@ -195,6 +195,20 @@ func (service *OutfitService) Unlike(outfitId, uid string) error {
 	return nil
 }
 
+func (service *OutfitService) RemoveLink(outfitId string, link Link) error {
+	collection := service.Client.Collection(outfitCollection)
+
+	_, err := collection.Doc(outfitId).Update(context.TODO(), []firestore.Update{{
+		Path:  "links",
+		Value: firestore.ArrayRemove(link),
+	}})
+	if err != nil {
+		return fmt.Errorf("remove link: %w", err)
+	}
+
+	return nil
+}
+
 // *********** OLD ****************
 
 // func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
