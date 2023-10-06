@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -74,6 +75,40 @@ func (service *UserService) UpdateUser(uid, displayName, photoUrl string) error 
 	}
 
 	return nil
+}
+
+func (service *UserService) Filter(filterString string) ([]User, error) {
+	collection := service.Client.Collection(usersCollection)
+
+	refs := collection.DocumentRefs(context.TODO())
+
+	var users []User
+
+	for ref, err := refs.Next(); err == nil; ref, err = refs.Next() {
+		snapshot, err := ref.Get(context.TODO())
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		displayName, err := snapshot.DataAt("displayName")
+
+		// TODO: Sort by point
+	}
+
+	return nil, nil
+}
+
+func (service *UserService) isMatchFilter(displayName string, filters []string) bool {
+	// TODO: Increment the point for every match.
+
+	for _, filter := range filters {
+		if strings.Contains(displayName, filter) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (service *UserService) Follow(currentUid, followedUid string) error {

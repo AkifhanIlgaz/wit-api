@@ -96,6 +96,10 @@ func (controller *UsersController) Update(w http.ResponseWriter, r *http.Request
 
 }
 
+func (controller *UsersController) Filter(w http.ResponseWriter, r *http.Request) {
+	
+}
+
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {
 	currentUid := ctx.Uid(r.Context())
 	followedUid := r.FormValue("uid")

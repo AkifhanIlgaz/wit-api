@@ -87,6 +87,7 @@ func main() {
 	r.Get("/user/saved", usersController.Saved)
 	r.Get("/user/", usersController.User)
 	r.Put("/user/update", usersController.Update)
+	r.Get("/user/filter", usersController.Filter)
 	fmt.Println("Starting app")
 	http.ListenAndServe(":3000", r)
 
