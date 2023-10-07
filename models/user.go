@@ -100,15 +100,18 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 }
 
 func (service *UserService) isMatchFilter(displayName string, filters []string) bool {
-	// TODO: Increment the point for every match.
+	displayName = strings.ToLower(displayName)
+
+	isMatched := true
 
 	for _, filter := range filters {
-		if strings.Contains(displayName, filter) {
-			return true
+		filter = strings.ToLower(filter)
+		if !strings.Contains(displayName, filter) {
+			return false
 		}
 	}
 
-	return false
+	return isMatched
 }
 
 func (service *UserService) Follow(currentUid, followedUid string) error {
