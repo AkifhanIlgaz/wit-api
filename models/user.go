@@ -81,6 +81,7 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
 
 	refs := collection.DocumentRefs(context.TODO())
+	filters := strings.Fields(filterString)
 
 	var users []User
 
@@ -92,11 +93,26 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 		}
 
 		displayName, err := snapshot.DataAt("displayName")
+		if err != nil {
+			return nil, fmt.Errorf("filter: %w", err)
+		}
+
+		if service.isMatchFilter(displayName.(string), filters) {
+			var user User
+			user.Uid = snapshot.Ref.ID
+			err = snapshot.DataTo(&user)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			users = append(users, user)
+
+		}
 
 		// TODO: Sort by point
 	}
 
-	return nil, nil
+	return users, nil
 }
 
 func (service *UserService) isMatchFilter(displayName string, filters []string) bool {
