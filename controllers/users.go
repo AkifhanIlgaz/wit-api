@@ -22,7 +22,7 @@ type UsersController struct {
 
 func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
-	user, err := controller.UserService.GetUser(r.URL.Query().Get("uid"))
+	user, err := controller.UserService.Get(r.URL.Query().Get("uid"))
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -38,7 +38,7 @@ func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Request) {
+func (controller *UsersController) New(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
 
 	body, err := io.ReadAll(r.Body)
@@ -54,7 +54,7 @@ func (controller *UsersController) NewUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = controller.UserService.AddUser(*uid, user)
+	err = controller.UserService.Add(*uid, user)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -88,7 +88,7 @@ func (controller *UsersController) Update(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = controller.UserService.UpdateUser(*uid, res.DisplayName, res.PhotoUrl)
+	err = controller.UserService.Update(*uid, res.DisplayName, res.PhotoUrl)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -141,7 +141,7 @@ func (controller *UsersController) Unfollow(w http.ResponseWriter, r *http.Reque
 
 func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
-	user, err := controller.UserService.GetUser(*uid)
+	user, err := controller.UserService.Get(*uid)
 
 	var outfitIds []string
 	last := r.URL.Query().Get("last")
@@ -159,7 +159,7 @@ func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request)
 			outfitIds = user.Saved[index+1:]
 		}
 	}
-	saved, err := controller.OutfitService.GetOutfits(outfitIds)
+	saved, err := controller.OutfitService.Outfits(outfitIds)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -205,7 +205,7 @@ func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Requ
 	uid := r.URL.Query().Get("uid")
 	lastFollower := r.URL.Query().Get("last")
 
-	followers, err := controller.UserService.GetFollowers(uid, lastFollower)
+	followers, err := controller.UserService.Followers(uid, lastFollower)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -223,7 +223,7 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 	uid := r.URL.Query().Get("uid")
 	lastFollowing := r.URL.Query().Get("lastFollowing")
 
-	followings, err := controller.UserService.GetFollowings(uid, lastFollowing)
+	followings, err := controller.UserService.Followings(uid, lastFollowing)
 	if err != nil {
 		fmt.Println(err)
 		return

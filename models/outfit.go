@@ -35,7 +35,7 @@ type OutfitService struct {
 	Client *firestore.Client
 }
 
-func (service *OutfitService) AddOutfit(outfit Outfit) error {
+func (service *OutfitService) Add(outfit Outfit) error {
 	collection := service.Client.Collection(outfitCollection)
 
 	doc := collection.NewDoc()
@@ -47,7 +47,7 @@ func (service *OutfitService) AddOutfit(outfit Outfit) error {
 	return nil
 }
 
-func (service *OutfitService) GetHomeOutfits(uids []string, last time.Time) ([]Outfit, error) {
+func (service *OutfitService) Home(uids []string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	var filter firestore.OrFilter
@@ -80,7 +80,7 @@ func (service *OutfitService) GetHomeOutfits(uids []string, last time.Time) ([]O
 	return outfits, nil
 }
 
-func (service *OutfitService) GetUserOutfits(uid string, last time.Time) ([]Outfit, error) {
+func (service *OutfitService) User(uid string, last time.Time) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	snapshots, err := collection.Where("uid", "==", uid).OrderBy("createdAt", firestore.Desc).StartAfter(last).Limit(postNumbersPerRequest).Documents(context.TODO()).GetAll()
@@ -104,7 +104,7 @@ func (service *OutfitService) GetUserOutfits(uid string, last time.Time) ([]Outf
 	return outfits, nil
 }
 
-func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
+func (service *OutfitService) Outfit(outfitId string) (*Outfit, error) {
 	var outfit Outfit
 
 	collection := service.Client.Collection(outfitCollection)
@@ -119,7 +119,7 @@ func (service *OutfitService) GetOutfit(outfitId string) (*Outfit, error) {
 	return &outfit, nil
 }
 
-func (service *OutfitService) GetOutfits(outfitIds []string) ([]Outfit, error) {
+func (service *OutfitService) Outfits(outfitIds []string) ([]Outfit, error) {
 	collection := service.Client.Collection(outfitCollection)
 	var outfits []Outfit
 
@@ -144,7 +144,7 @@ func (service *OutfitService) GetOutfits(outfitIds []string) ([]Outfit, error) {
 	return outfits, nil
 }
 
-func (service *OutfitService) GetOutfitCountOfUser(uid string) (int, error) {
+func (service *OutfitService) OutfitCountOfUser(uid string) (int, error) {
 	collection := service.Client.Collection(outfitCollection)
 
 	query := collection.Where("uid", "==", uid)
@@ -163,7 +163,7 @@ func (service *OutfitService) GetOutfitCountOfUser(uid string) (int, error) {
 	return int(countValue.GetIntegerValue()), nil
 }
 
-func (service *OutfitService) GetLikeStatus(outfit *Outfit, uid string) (bool, int) {
+func (service *OutfitService) LikeStatus(outfit *Outfit, uid string) (bool, int) {
 	return slices.Contains[[]string, string](outfit.Likes, uid), len(outfit.Likes)
 }
 
@@ -208,76 +208,3 @@ func (service *OutfitService) RemoveLink(outfitId string, link Link) error {
 
 	return nil
 }
-
-// *********** OLD ****************
-
-// func (service *OutfitService) DeleteOutfit(uid, outfitId string) error {
-// 	collection := service.Client.Collection(outfitCollection)
-// 	var outfit Outfit
-// 	// ! If current user is not the owner of this outfit return error
-// 	doc := collection.Doc(outfitId)
-// 	snapshot, err := doc.Get(context.TODO())
-// 	if err != nil {
-// 		return fmt.Errorf("delete outfit | get: %w", err)
-// 	}
-// 	err = snapshot.DataTo(&outfit)
-// 	if err != nil {
-// 		return fmt.Errorf("delete outfit | data to: %w", err)
-// 	}
-
-// 	if outfit.Uid != uid {
-// 		return fmt.Errorf("current user is not the owner of this outfit")
-// 	}
-
-// 	_, err = doc.Delete(context.TODO())
-// 	if err != nil {
-// 		return fmt.Errorf("delete outfit: %w", err)
-// 	}
-
-// 	return nil
-// }
-
-// // TODO: Update outfit
-
-// func (service *OutfitService) GetAllOutfitsByUid(uid string) ([]Outfit, error) {
-// 	collection := service.Client.Collection(outfitCollection)
-// 	outfits := []Outfit{}
-
-// 	iter := collection.Where("Uid", "==", uid).Documents(context.TODO())
-// 	for {
-// 		var outfit Outfit
-// 		doc, err := iter.Next()
-// 		if err == iterator.Done {
-// 			break
-// 		}
-// 		if err != nil {
-// 			return nil, fmt.Errorf("get outfits by uid: %w", err)
-// 		}
-
-// 		err = doc.DataTo(&outfit)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("get outfits by uid | data to: %w", err)
-// 		}
-
-// 		outfits = append(outfits, outfit)
-// 	}
-
-// 	return outfits, nil
-// }
-
-// func (service *OutfitService) GetOutfitById(outfitId string) (*Outfit, error) {
-// 	collection := service.Client.Collection(outfitCollection)
-// 	var outfit Outfit
-
-// 	snapshot, err := collection.Doc(outfitId).Get(context.TODO())
-// 	if err != nil {
-// 		return nil, fmt.Errorf("get outfit by id: %w", err)
-// 	}
-
-// 	err = snapshot.DataTo(&outfit)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("get outfit by id | data to : %w", err)
-// 	}
-
-// 	return &outfit, nil
-// }

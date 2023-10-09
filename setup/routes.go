@@ -24,7 +24,7 @@ func Routes(uidMiddleware *controllers.UidMiddleware, firebaseController *contro
 	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
 
 	r.Route("/outfit", func(r chi.Router) {
-		r.Post("/new", outfitsController.NewOutfit)
+		r.Post("/new", outfitsController.New)
 		r.Get("/home", outfitsController.Home)
 		r.Put("/like", outfitsController.Like)
 		r.Put("/unlike", outfitsController.Unlike)
@@ -35,7 +35,7 @@ func Routes(uidMiddleware *controllers.UidMiddleware, firebaseController *contro
 	})
 
 	r.Route("/user", func(r chi.Router) {
-		r.Post("/new", usersController.NewUser)
+		r.Post("/new", usersController.New)
 		r.Put("/follow", usersController.Follow)
 		r.Put("/unfollow", usersController.Unfollow)
 		r.Put("/save-outfit", usersController.SaveOutfit)

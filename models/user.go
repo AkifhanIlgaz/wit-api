@@ -13,12 +13,11 @@ import (
 
 const usersCollection = "users"
 
-// User stored on Firestore
 type User struct {
 	Uid         string   `firestore:"-" json:"uid"`
 	DisplayName string   `firestore:"displayName" json:"displayName"`
 	PhotoUrl    string   `firestore:"photoUrl" json:"photoUrl"`
-	Followers   []string `firestore:"followers" json:"-"` // Store followers by uid
+	Followers   []string `firestore:"followers" json:"-"`
 	Followings  []string `firestore:"followings" json:"-"`
 	Saved       []string `firestore:"saved" json:"-"`
 	IsFollowed  bool     `firestore:"-" json:"isFollowed"`
@@ -29,7 +28,7 @@ type UserService struct {
 	Auth   *auth.Client
 }
 
-func (service *UserService) AddUser(uid string, user User) error {
+func (service *UserService) Add(uid string, user User) error {
 	collection := service.Client.Collection(usersCollection)
 
 	_, err := collection.Doc(uid).Set(context.TODO(), user)
@@ -40,7 +39,7 @@ func (service *UserService) AddUser(uid string, user User) error {
 	return nil
 }
 
-func (service *UserService) GetUser(uid string) (*User, error) {
+func (service *UserService) Get(uid string) (*User, error) {
 	var user User
 	collection := service.Client.Collection(usersCollection)
 
@@ -53,7 +52,7 @@ func (service *UserService) GetUser(uid string) (*User, error) {
 	return &user, nil
 }
 
-func (service *UserService) UpdateUser(uid, displayName, photoUrl string) error {
+func (service *UserService) Update(uid, displayName, photoUrl string) error {
 	collection := service.Client.Collection(usersCollection)
 
 	var updates []firestore.Update
@@ -214,7 +213,7 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 }
 
 // TODO: Sort and limit
-func (service *UserService) GetFollowers(uid, last string) ([]User, error) {
+func (service *UserService) Followers(uid, last string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
 
 	snapshot, _ := collection.Doc(uid).Get(context.TODO())
@@ -259,7 +258,7 @@ func (service *UserService) GetFollowers(uid, last string) ([]User, error) {
 }
 
 // TODO: Sort and limit
-func (service *UserService) GetFollowings(uid, last string) ([]User, error) {
+func (service *UserService) Followings(uid, last string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
 
 	snapshot, _ := collection.Doc(uid).Get(context.TODO())

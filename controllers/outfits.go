@@ -27,7 +27,7 @@ type outfitResponse struct {
 	DisplayName  string `json:"displayName"`
 }
 
-func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Request) {
+func (controller *OutfitsController) New(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Please provide body", http.StatusBadRequest)
@@ -45,7 +45,7 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 	}
 	outfit.PhotoUrl = controller.Storage.GetDownloadUrl(outfit.PhotoUrl)
 
-	err = controller.OutfitService.AddOutfit(outfit)
+	err = controller.OutfitService.Add(outfit)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func (controller *OutfitsController) NewOutfit(w http.ResponseWriter, r *http.Re
 
 func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request) {
 	uid := ctx.Uid(r.Context())
-	user, err := controller.UserService.GetUser(*uid)
+	user, err := controller.UserService.Get(*uid)
 	if err != nil {
 		// TODO: Check if user not exist or there was an error with firestore
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -63,7 +63,7 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 
 	last := convertToTime(r.URL.Query().Get("last"))
 
-	outfits, err := controller.OutfitService.GetHomeOutfits(user.Followings, last)
+	outfits, err := controller.OutfitService.Home(user.Followings, last)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -74,11 +74,11 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 	for _, outfit := range outfits {
 		var resp outfitResponse
 
-		isLiked, likeCount := controller.OutfitService.GetLikeStatus(&outfit, *uid)
+		isLiked, likeCount := controller.OutfitService.LikeStatus(&outfit, *uid)
 		resp.Outfit = outfit
 		resp.IsLiked = isLiked
 		resp.LikeCount = likeCount
-		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
+		outfitOwner, err := controller.UserService.Get(outfit.Uid)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
@@ -104,7 +104,7 @@ func (controller *OutfitsController) Count(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	count, err := controller.OutfitService.GetOutfitCountOfUser(uid)
+	count, err := controller.OutfitService.OutfitCountOfUser(uid)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -129,7 +129,7 @@ func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "User doesn't exist", http.StatusBadRequest)
 		return
 	}
-	user, err := controller.UserService.GetUser(uid)
+	user, err := controller.UserService.Get(uid)
 	if err != nil {
 		// TODO: Check if user not exist or there was an error with firestore
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -137,7 +137,7 @@ func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request)
 	}
 
 	last := convertToTime(r.URL.Query().Get("last"))
-	outfits, err := controller.OutfitService.GetUserOutfits(uid, last)
+	outfits, err := controller.OutfitService.User(uid, last)
 	if err != nil {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -148,11 +148,11 @@ func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request)
 	for _, outfit := range outfits {
 		var resp outfitResponse
 
-		isLiked, likeCount := controller.OutfitService.GetLikeStatus(&outfit, uid)
+		isLiked, likeCount := controller.OutfitService.LikeStatus(&outfit, uid)
 		resp.Outfit = outfit
 		resp.IsLiked = isLiked
 		resp.LikeCount = likeCount
-		outfitOwner, err := controller.UserService.GetUser(outfit.Uid)
+		outfitOwner, err := controller.UserService.Get(outfit.Uid)
 		if err != nil {
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
 			return
