@@ -25,26 +25,34 @@ func Routes(uidMiddleware *controllers.UidMiddleware, firebaseController *contro
 
 	r.Route("/outfit", func(r chi.Router) {
 		r.Post("/new", outfitsController.New)
+		
 		r.Get("/home", outfitsController.Home)
+
 		r.Put("/like", outfitsController.Like)
 		r.Put("/unlike", outfitsController.Unlike)
+
 		r.Get("/all", outfitsController.All)
+
 		r.Get("/count", outfitsController.Count)
+
 		r.Delete("/links", outfitsController.RemoveLink)
-		r.Put("/links", outfitsController.UpdateLink)
 	})
 
 	r.Route("/user", func(r chi.Router) {
 		r.Post("/new", usersController.New)
-		r.Put("/follow", usersController.Follow)
-		r.Put("/unfollow", usersController.Unfollow)
-		r.Put("/save-outfit", usersController.SaveOutfit)
-		r.Put("/unsave-outfit", usersController.UnsaveOutfit)
-		r.Get("/followers", usersController.Followers)
-		r.Get("/followings", usersController.Followings)
-		r.Get("/saved", usersController.Saved)
 		r.Get("/", usersController.User)
 		r.Put("/update", usersController.Update)
+
+		r.Put("/follow", usersController.Follow)
+		r.Put("/unfollow", usersController.Unfollow)
+
+		r.Get("/saved", usersController.Saved)
+		r.Put("/save-outfit", usersController.SaveOutfit)
+		r.Put("/unsave-outfit", usersController.UnsaveOutfit)
+
+		r.Get("/followers", usersController.Followers)
+		r.Get("/followings", usersController.Followings)
+
 		r.Get("/filter", usersController.Filter)
 	})
 

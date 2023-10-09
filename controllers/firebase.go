@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -38,8 +37,10 @@ func (controller *FirebaseController) GenerateUploadUrl(w http.ResponseWriter, r
 		"filePath":  filePath,
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.Encode(resp)
+	err = writeToResponse(w, resp)
+	if err != nil {
+		return
+	}
 }
 
 func storageDirByType(t string) (string, error) {

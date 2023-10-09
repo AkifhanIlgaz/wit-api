@@ -29,10 +29,9 @@ func (controller *UsersController) User(w http.ResponseWriter, r *http.Request) 
 	}
 
 	user.IsFollowed = controller.UserService.IsFollowed(user.Followers, *uid)
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(&user)
+
+	err = writeToResponse(w, user)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -105,12 +104,11 @@ func (controller *UsersController) Filter(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	err = enc.Encode(&users)
+	err = writeToResponse(w, users)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {
@@ -166,10 +164,8 @@ func (controller *UsersController) Saved(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	err = enc.Encode(&saved)
+	err = writeToResponse(w, saved)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -211,10 +207,8 @@ func (controller *UsersController) Followers(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	err = enc.Encode(&followers)
+	err = writeToResponse(w, followers)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 }
@@ -229,10 +223,8 @@ func (controller *UsersController) Followings(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	err = enc.Encode(&followings)
+	err = writeToResponse(w, followings)
 	if err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 

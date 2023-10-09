@@ -105,7 +105,6 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 				continue
 			}
 			users = append(users, user)
-
 		}
 	}
 
@@ -114,7 +113,6 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 
 func (service *UserService) isMatchFilter(displayName string, filters []string) bool {
 	displayName = strings.ToLower(displayName)
-
 	isMatched := true
 
 	for _, filter := range filters {
@@ -212,7 +210,6 @@ func (service *UserService) UnsaveOutfit(outfitId, uid string) error {
 	return nil
 }
 
-// TODO: Sort and limit
 func (service *UserService) Followers(uid, last string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
 
@@ -257,7 +254,6 @@ func (service *UserService) Followers(uid, last string) ([]User, error) {
 	return followers, nil
 }
 
-// TODO: Sort and limit
 func (service *UserService) Followings(uid, last string) ([]User, error) {
 	collection := service.Client.Collection(usersCollection)
 

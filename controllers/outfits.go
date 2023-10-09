@@ -89,9 +89,8 @@ func (controller *OutfitsController) Home(w http.ResponseWriter, r *http.Request
 		respBody = append(respBody, resp)
 	}
 
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(&respBody); err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+	err = writeToResponse(w, respBody)
+	if err != nil {
 		return
 	}
 
@@ -116,9 +115,8 @@ func (controller *OutfitsController) Count(w http.ResponseWriter, r *http.Reques
 		OutfitCount: count,
 	}
 
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(&respBody); err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+	err = writeToResponse(w, respBody)
+	if err != nil {
 		return
 	}
 }
@@ -163,9 +161,8 @@ func (controller *OutfitsController) All(w http.ResponseWriter, r *http.Request)
 		respBody = append(respBody, resp)
 	}
 
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(&respBody); err != nil {
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+	err = writeToResponse(w, respBody)
+	if err != nil {
 		return
 	}
 }
@@ -217,14 +214,8 @@ func (controller *OutfitsController) RemoveLink(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	fmt.Printf("%+v\n", link)
-
 	err = controller.OutfitService.RemoveLink(outfitId, link)
 	fmt.Println(err)
-
-}
-
-func (controller *OutfitsController) UpdateLink(w http.ResponseWriter, r *http.Request) {
 
 }
 
