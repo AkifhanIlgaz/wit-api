@@ -97,7 +97,20 @@ func (controller *UsersController) Update(w http.ResponseWriter, r *http.Request
 }
 
 func (controller *UsersController) Filter(w http.ResponseWriter, r *http.Request) {
-	
+	filterString := r.URL.Query().Get("filterString")
+
+	users, err := controller.UserService.Filter(filterString)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	enc := json.NewEncoder(w)
+	err = enc.Encode(&users)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (controller *UsersController) Follow(w http.ResponseWriter, r *http.Request) {

@@ -108,8 +108,6 @@ func (service *UserService) Filter(filterString string) ([]User, error) {
 			users = append(users, user)
 
 		}
-
-		// TODO: Sort by point
 	}
 
 	return users, nil
