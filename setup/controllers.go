@@ -1,32 +1,42 @@
 package setup
 
 import (
-	"github.com/AkifhanIlgaz/wit-api/controllers"
-	"github.com/AkifhanIlgaz/wit-api/firebase"
-	"github.com/AkifhanIlgaz/wit-api/models"
+	ctrls "github.com/AkifhanIlgaz/wit-api/controllers"
 )
 
-func Controllers(myApp *firebase.MyApp, outfitService *models.OutfitService, userService *models.UserService) (*controllers.UidMiddleware, *controllers.FirebaseController, *controllers.OutfitsController, *controllers.UsersController) {
-	uidMiddleware := controllers.UidMiddleware{
-		Auth: myApp.Auth,
+type controllers struct {
+	UidMiddleware      *ctrls.UidMiddleware
+	FirebaseController *ctrls.FirebaseController
+	OutfitsController  *ctrls.OutfitsController
+	UsersController    *ctrls.UsersController
+}
+
+func Controllers(services *services) *controllers {
+	uidMiddleware := ctrls.UidMiddleware{
+		Auth: services.MyApp.Auth,
 	}
 
-	firebaseController := controllers.FirebaseController{
-		Storage: myApp.Storage,
+	firebaseController := ctrls.FirebaseController{
+		Storage: services.MyApp.Storage,
 	}
 
-	outfitsController := controllers.OutfitsController{
-		Storage:       myApp.Storage,
-		OutfitService: outfitService,
-		UserService:   userService,
+	outfitsController := ctrls.OutfitsController{
+		Storage:       services.MyApp.Storage,
+		OutfitService: services.OutfitService,
+		UserService:   services.UserService,
 	}
 
-	usersController := controllers.UsersController{
-		UserService:   userService,
-		OutfitService: outfitService,
-		Auth:          myApp.Auth,
-		Storage:       myApp.Storage,
+	usersController := ctrls.UsersController{
+		UserService:   services.UserService,
+		OutfitService: services.OutfitService,
+		Auth:          services.MyApp.Auth,
+		Storage:       services.MyApp.Storage,
 	}
 
-	return &uidMiddleware, &firebaseController, &outfitsController, &usersController
+	return &controllers{
+		UidMiddleware:      &uidMiddleware,
+		FirebaseController: &firebaseController,
+		OutfitsController:  &outfitsController,
+		UsersController:    &usersController,
+	}
 }

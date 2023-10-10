@@ -1,15 +1,14 @@
 package setup
 
 import (
-	"github.com/AkifhanIlgaz/wit-api/controllers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
 
-func Routes(uidMiddleware *controllers.UidMiddleware, firebaseController *controllers.FirebaseController, outfitsController *controllers.OutfitsController, usersController *controllers.UsersController) *chi.Mux {
+func Routes(controllers *controllers) *chi.Mux {
 	r := chi.NewMux()
 
-	r.Use(uidMiddleware.SetUid)
+	r.Use(controllers.UidMiddleware.SetUid)
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -21,39 +20,39 @@ func Routes(uidMiddleware *controllers.UidMiddleware, firebaseController *contro
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Get("/generate-upload-url", firebaseController.GenerateUploadUrl)
+	r.Get("/generate-upload-url", controllers.FirebaseController.GenerateUploadUrl)
 
 	r.Route("/outfit", func(r chi.Router) {
-		r.Post("/new", outfitsController.New)
-		
-		r.Get("/home", outfitsController.Home)
+		r.Post("/new", controllers.OutfitsController.New)
 
-		r.Put("/like", outfitsController.Like)
-		r.Put("/unlike", outfitsController.Unlike)
+		r.Get("/home", controllers.OutfitsController.Home)
 
-		r.Get("/all", outfitsController.All)
+		r.Put("/like", controllers.OutfitsController.Like)
+		r.Put("/unlike", controllers.OutfitsController.Unlike)
 
-		r.Get("/count", outfitsController.Count)
+		r.Get("/all", controllers.OutfitsController.All)
 
-		r.Delete("/links", outfitsController.RemoveLink)
+		r.Get("/count", controllers.OutfitsController.Count)
+
+		r.Delete("/links", controllers.OutfitsController.RemoveLink)
 	})
 
 	r.Route("/user", func(r chi.Router) {
-		r.Post("/new", usersController.New)
-		r.Get("/", usersController.User)
-		r.Put("/update", usersController.Update)
+		r.Post("/new", controllers.UsersController.New)
+		r.Get("/", controllers.UsersController.User)
+		r.Put("/update", controllers.UsersController.Update)
 
-		r.Put("/follow", usersController.Follow)
-		r.Put("/unfollow", usersController.Unfollow)
+		r.Put("/follow", controllers.UsersController.Follow)
+		r.Put("/unfollow", controllers.UsersController.Unfollow)
 
-		r.Get("/saved", usersController.Saved)
-		r.Put("/save-outfit", usersController.SaveOutfit)
-		r.Put("/unsave-outfit", usersController.UnsaveOutfit)
+		r.Get("/saved", controllers.UsersController.Saved)
+		r.Put("/save-outfit", controllers.UsersController.SaveOutfit)
+		r.Put("/unsave-outfit", controllers.UsersController.UnsaveOutfit)
 
-		r.Get("/followers", usersController.Followers)
-		r.Get("/followings", usersController.Followings)
+		r.Get("/followers", controllers.UsersController.Followers)
+		r.Get("/followings", controllers.UsersController.Followings)
 
-		r.Get("/filter", usersController.Filter)
+		r.Get("/filter", controllers.UsersController.Filter)
 	})
 
 	return r

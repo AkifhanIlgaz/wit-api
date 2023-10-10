@@ -1,18 +1,25 @@
 package setup
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/AkifhanIlgaz/wit-api/firebase"
 	"github.com/AkifhanIlgaz/wit-api/models"
 )
 
-func Services() (*firebase.MyApp, *models.OutfitService, *models.UserService) {
+type services struct {
+	MyApp         *firebase.MyApp
+	OutfitService *models.OutfitService
+	UserService   *models.UserService
+}
+
+func Services() (*services, error) {
 	credentialsFile := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 	myApp, err := firebase.NewApp(credentialsFile)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("setup services | firebase: %w", err)
 	}
 
 	outfitService := &models.OutfitService{
@@ -23,5 +30,9 @@ func Services() (*firebase.MyApp, *models.OutfitService, *models.UserService) {
 		Client: myApp.Firestore.Client,
 	}
 
-	return myApp, outfitService, userService
+	return &services{
+		MyApp:         myApp,
+		OutfitService: outfitService,
+		UserService:   userService,
+	}, nil
 }
