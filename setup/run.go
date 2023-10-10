@@ -22,7 +22,7 @@ func Run(port string) error {
 
 	r := Routes(controllers)
 
-	fmt.Println("Starting app on port: %v", port)
+	fmt.Printf("Starting app on port: %v\n", port)
 	err = http.ListenAndServe(port, r)
 	if err != nil {
 		return fmt.Errorf("run: %w", err)
